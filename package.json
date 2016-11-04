@@ -1,0 +1,34 @@
+{
+  "name": "hello-world",
+  "version": "1.0.0",
+  "description": "one test app for react research",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/junzzhang/hello-world.git"
+  },
+  "author": "Vincent",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/junzzhang/hello-world/issues"
+  },
+  "homepage": "https://github.com/junzzhang/hello-world#readme",
+  "dependencies": {
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2"
+  },
+  "devDependencies": {
+    "bundle-loader": "^0.5.4",
+    "copy-webpack-plugin": "^3.0.1",
+    "css-loader": "^0.25.0",
+    "file-loader": "^0.9.0",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
+  }
+}
