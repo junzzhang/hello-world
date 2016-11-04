@@ -5,7 +5,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
 	entry: [
-		"./src/app.js"
+		"./src/main.jsx"
 	],
 	output: {
 		path: path.join(__dirname, "build"),
@@ -33,12 +33,10 @@ module.exports = {
 	},
 	plugins: [
 	    //把指定文件夹下的文件复制到指定的目录
-	    /*new CopyWebpackPlugin([
-		        {from: './src/lib', to: 'lib'},
-		        {from: './src/modules/locale/i18n', to: 'i18n'},
+	    new CopyWebpackPlugin([
 		        {from: './src/index.html', to: '../index.html'}
 	      	]
-	    ),*/
+	    ),
 	    new webpack.optimize.UglifyJsPlugin({
 	      	compress: {
 	        	warnings: false
