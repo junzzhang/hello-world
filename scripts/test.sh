@@ -16,9 +16,6 @@ then
           echo "正在升级版本号，生成更新日志 CHANGELOG.md ..."
           npm run release --skip.tag
 
-          echo "将代码推至远程代码仓库"
-          git push
-
           if [[ $current_branch != "master" ]]
           then
               echo "切至 master 分支"
@@ -34,8 +31,8 @@ then
           echo "正在创建本地 tag $new_tag"
           git tag $new_tag
 
-          echo "上传本地 tag 至 远程仓库"
-          git push origin $new_tag
+          echo "将代码推至远程代码仓库"
+          git push --follow-tags origin master
 
           echo "发布完成。"
     else
