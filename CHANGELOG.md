@@ -1,0 +1,10 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [1.0.1](https://github.com/junzzhang/hello-world/compare/v1.0.0...v1.0.1) (2020-11-03)
+
+
+### Bug Fixes
+
+* 修复package.json 文件格式错误 ([cd31d05](https://github.com/junzzhang/hello-world/commit/cd31d050a710a3e364b2cbbe7be61a45e7500cc7))
