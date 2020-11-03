@@ -1,3 +1,4 @@
 # modify for testing diff opration.
 /.idea
 /.DS_Store
+/node_modules
