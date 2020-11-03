@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/junzzhang/hello-world/compare/v1.1.6...v1.3.0) (2020-11-03)
+
+
+### Features
+
+* enhance test.h ([c8bedd2](https://github.com/junzzhang/hello-world/commit/c8bedd2ec4014a764e7bb5c55713b5c83976f081))
+
 ## [1.2.0](https://github.com/junzzhang/hello-world/compare/v1.1.6...v1.2.0) (2020-11-03)
 
 
