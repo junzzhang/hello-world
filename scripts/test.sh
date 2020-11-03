@@ -3,7 +3,7 @@
 cd $(dirname $0)/..
 
 status_info=`git status 2>&1`
-if [[ $status_info =~ "working tree clean" ]]
+if [[ $status_info =~ "working tree clean" && $status_info =~ "Your branch is up to date with" ]]
 then
     current_branch=`git branch --show-current`
     echo "确定要发布当前分支 $current_branch 吗？（yes, no）"
