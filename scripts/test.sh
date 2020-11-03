@@ -18,6 +18,9 @@ then
 
           if [[ $current_branch != "master" ]]
           then
+              echo "将当前分支 $current_branch 代码推至远程代码仓库..."
+              git push
+
               echo "切至 master 分支"
               git checkout master
 
