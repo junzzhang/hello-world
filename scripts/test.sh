@@ -34,6 +34,15 @@ then
           echo "将代码推至远程代码仓库"
           git push --follow-tags origin master
 
+          if [[ $current_branch != 'master' ]]
+          then
+              echo "删除远程分支 $current_branch"
+              git push origin --delete $current_branch
+
+              echo "删除本地分支 $current_branch"
+              git branch -d $current_branch
+          fi
+
           echo "发布完成。"
     else
         echo "您取消了发布当前分支。"
