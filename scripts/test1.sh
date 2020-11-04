@@ -6,11 +6,12 @@ function mergeIntoFromMaster() {
     allLocalBranches=$3
 
     # 检测是否存在与远程分支对应的本地分支，不存在就拉下来
+    echo "allLocalBranches: $allLocalBranches[@]"
     if [[ ! " ${allLocalBranches[@]} " =~ " ${localBranchName} " ]]
     then
 
         echo "迁出远程分支 ${remoteBranch}...${localBranchName}"
-        git branch --no-track $localBranchName refs/${remoteBranch}
+        git branch --no-track $localBranchName refs/remotes/${remoteBranch}
         git branch --set-upstream-to=$remoteBranch
         echo "切到分支 ${localBranchName}..."
         git checkout $localBranchName
