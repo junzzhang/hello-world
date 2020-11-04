@@ -9,9 +9,11 @@ function mergeIntoFromMaster() {
     if [[ ! " ${allLocalBranches[@]} " =~ " ${localBranchName} " ]]
     then
 
-        echo "迁出远程分支 ${remoteBranch}...${localBranchName}"
+        echo "迁出远程分支 ${remoteBranch}..."
         git branch --no-track $localBranchName refs/remotes/${remoteBranch}
-        git branch --set-upstream-to=$remoteBranch
+        if [[ $? -eq 0 ]]; then
+          git branch --set-upstream-to=$remoteBranch
+        fi
         echo "切到分支 ${localBranchName}..."
         git checkout $localBranchName
 
@@ -46,7 +48,7 @@ function mergeIntoBranchesFromMaster() {
     echo "将 master 代码合并至所有开发及测试分支"
     remoteBranchNamePrefix='origin/'
     allRemoteBranches=$(git branch --remotes --format='%(refname:short)')
-    allLocalBranches=$(git branch --format='%(refname:short)')
+    allLocalBranches=($(git branch --format='%(refname:short)'))
 
     successBranches=()
     failBranches=()
@@ -64,7 +66,7 @@ function mergeIntoBranchesFromMaster() {
                 read needMerge
 
                 if [[ $needMerge = "yes" ]]; then
-                    mergeIntoFromMaster $remoteBranch $localBranchName "${allLocalBranches[@]}"
+                    mergeIntoFromMaster $remoteBranch $localBranchName ${allLocalBranches[@]}
                     if [ $? == 0 ]; then
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
