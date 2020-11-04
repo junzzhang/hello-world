@@ -21,13 +21,14 @@ function checkoutAndPullLocalBranch() {
         echo "切到分支 ${localBranch}..."
         git checkout $localBranch
 
-        if [[ $? -eq 0 ]]; then
+        result = $?
+        if [[ $result -eq 0 ]]; then
           echo "同步远程仓库..."
           git pull
           return $?
         fi
 
-        return $?
+        return $result
     fi
 }
 
@@ -180,9 +181,12 @@ then
             echo "将当前分支 $current_branch 代码推至远程代码仓库..."
             git push
 
-            # 将当前分支 合并至 master 分支
-            margeLocalBranch $current_branch "master"
             mergeSuccess=$?
+            if [[ $mergeSuccess -eq 0 ]]; then
+                # 将当前分支 合并至 master 分支
+                margeLocalBranch $current_branch "master"
+                mergeSuccess=$?
+            fi
         fi
 
         if [[ $mergeSuccess -eq 0 ]]; then
@@ -195,17 +199,21 @@ then
             echo "将代码推至远程代码仓库"
             git push --follow-tags origin master
 
-            if [[ $current_branch != 'master' ]]; then
-                removeLocalBranch $current_branch
-            fi
-
-            # 将 master 代码合并至所有开发及测试分支
-            mergeIntoBranchesFromMaster
-
             if [[ $? -eq 0 ]]; then
-                echo -e "\n\033[32m 发布完成 \033[0m\n"
+                if [[ $current_branch != 'master' ]]; then
+                    removeLocalBranch $current_branch
+                fi
+
+                # 将 master 代码合并至所有开发及测试分支
+                mergeIntoBranchesFromMaster
+
+                if [[ $? -eq 0 ]]; then
+                    echo -e "\n\033[32m 发布完成 \033[0m\n"
+                else
+                    echo -e "\n\033[31m 发布完成，请将合并失败的分支进行手动合并操作。 \033[0m\n"
+                fi
             else
-                echo -e "\n\033[31m 发布完成，请将合并失败的分支进行手动合并操作。 \033[0m\n"
+                echo -e "\n\033[31m 发布失败：分支 master 代码没有成功推到远程仓库，接下来你最好手动进行发版操作。 \033[0m\n"
             fi
         else
             echo -e "\n\033[31m 发布失败：分支 $current_branch 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。 \033[0m\n"
