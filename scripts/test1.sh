@@ -27,7 +27,7 @@ function mergeIntoFromMaster() {
     echo "将 master 代码合并至分支 ${localBranchName}..."
     merge_info=`git merge master 2>&1`
 
-    if [ $merge_info =~ "Automatic merge failed" ]
+    if [[ $merge_info =~ "Automatic merge failed" ]]
     then
         echo "分支 ${localBranchName} 代码合并失败，取消合并操作..."
         git reset --hard HEAD --
