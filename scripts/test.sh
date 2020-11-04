@@ -90,9 +90,8 @@ function mergeIntoBranchesFromMaster() {
 
     if [ ${#otherBranches[*]} -gt 0 ]; then
         # 打印分格
-        echo -e "\n ----------------"
-
-        echo "没有执行合并操作的分支有 ${#otherBranches[*]} 个，如下所示：\n"
+        echo -e "\n ----------------\n"
+        echo -e "没有执行合并操作的分支有 ${#otherBranches[*]} 个，如下所示：\n"
         for name in ${otherBranches[*]}; do
           echo $name
         done
@@ -100,7 +99,7 @@ function mergeIntoBranchesFromMaster() {
 
     if [ ${#failBranches[*]} -gt 0 ]; then
         # 打印分格
-        echo -e "\n ----------------"
+        echo -e "\n ----------------\n"
 
         echo -e "\033[31m 合并失败的分支有 ${#failBranches[*]} 个，如下所示： \033[0m\n"
         for name in ${failBranches[*]}; do
