@@ -85,7 +85,7 @@ function mergeIntoBranchesFromMaster() {
       echo $name
     done
 
-    if [ ${#otherBranches[*]} > 0 ]; then
+    if [ ${#otherBranches[*]} -gt 0 ]; then
         # 打印分格
         echo "----------------"
 
@@ -97,7 +97,7 @@ function mergeIntoBranchesFromMaster() {
         return 1
     fi
 
-    if [ ${#failBranches[*]} > 0 ]; then
+    if [ ${#failBranches[*]} -gt 0 ]; then
         # 打印分格
         echo "----------------"
 
