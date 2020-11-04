@@ -21,7 +21,7 @@ function checkoutAndPullLocalBranch() {
         echo "切到分支 ${localBranch}..."
         git checkout $localBranch
 
-        result = $?
+        result=$?
         if [[ $result -eq 0 ]]; then
           echo "同步远程仓库..."
           git pull
