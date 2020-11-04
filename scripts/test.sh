@@ -45,12 +45,13 @@ function margeLocalBranch() {
         echo "将分支 ${fromBranch} 合并至 ${destBranch} 分支"
         git merge $fromBranch
 
-        if [[ $? -ne 0 ]]; then
+        result=$?
+        if [[ $result -ne 0 ]]; then
             echo -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${destBranch} 失败，取消合并操作... \033[0m"
             git reset --hard HEAD --
         fi
 
-        return $?
+        return $result
     fi
 
     return 1
