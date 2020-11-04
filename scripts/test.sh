@@ -96,8 +96,6 @@ function mergeIntoBranchesFromMaster() {
         for name in ${otherBranches[*]}; do
           echo $name
         done
-
-        return 1
     fi
 
     if [ ${#failBranches[*]} -gt 0 ]; then
