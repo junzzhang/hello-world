@@ -6,7 +6,6 @@ function mergeIntoFromMaster() {
     allLocalBranches=$3
 
     # 检测是否存在与远程分支对应的本地分支，不存在就拉下来
-    echo "allLocalBranches: $allLocalBranches[@]"
     if [[ ! " ${allLocalBranches[@]} " =~ " ${localBranchName} " ]]
     then
 
@@ -65,7 +64,7 @@ function mergeIntoBranchesFromMaster() {
                 read needMerge
 
                 if [[ $needMerge = "yes" ]]; then
-                    mergeIntoFromMaster $remoteBranch $localBranchName $allLocalBranches
+                    mergeIntoFromMaster $remoteBranch $localBranchName ${allLocalBranches[@]}
                     if [ $? == 0 ]; then
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
