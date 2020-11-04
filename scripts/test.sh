@@ -1,47 +1,80 @@
 #!/bin/bash
 
-# 将 master 代码合并至 指定分支；return 0 表示成功，return 1 表示失败
-function mergeIntoFromMaster() {
-    remoteBranch=$1
-    localBranchName=$2
-    allLocalBranches=$3
+function checkoutAndPullLocalBranch() {
+    localBranch=$1
+    allLocalBranches=($(git branch --format='%(refname:short)'))
 
     # 检测是否存在与远程分支对应的本地分支，不存在就拉下来
-    if [[ ! " ${allLocalBranches[@]} " =~ " ${localBranchName} " ]]
+    if [[ ! " ${allLocalBranches[@]} " =~ " ${localBranch} " ]]
     then
 
-        echo "迁出远程分支 ${remoteBranch}..."
-        git branch --no-track $localBranchName refs/remotes/${remoteBranch}
+        echo "迁出远程分支 origin/${localBranch}..."
+        git branch --no-track $localBranch refs/remotes/origin/${localBranch}
         if [[ $? -eq 0 ]]; then
-          git branch --set-upstream-to=$remoteBranch $localBranchName
+          git branch --set-upstream-to="origin/${localBranch}" $localBranch
         fi
-        echo "切到分支 ${localBranchName}..."
-        git checkout $localBranchName
-
+        echo "切到分支 ${localBranch}..."
+        git checkout $localBranch
+        return $?
     else
 
-        echo "切到分支 ${localBranchName}..."
-        git checkout $localBranchName
-        echo "同步远程仓库..."
-        git pull
+        echo "切到分支 ${localBranch}..."
+        git checkout $localBranch
 
+        if [[ $? -eq 0 ]]; then
+          echo "同步远程仓库..."
+          git pull
+          return $?
+        fi
+
+        return $?
+    fi
+}
+
+# 将源分支合并至目的分支: 返回值为 0 表示成功，否则表示 失败
+# 1. 保证源本地分支必须存在 2. 只做 merge ，不做 push
+function margeLocalBranch() {
+    # 源分支
+    fromBranch=$1
+    # 目的分支
+    destBranch=$2
+
+    checkoutAndPullLocalBranch $destBranch
+
+    if [[ $? -eq 0 ]]; then
+        echo "将分支 ${fromBranch} 合并至 ${destBranch} 分支"
+        git merge $fromBranch
+
+        if [[ $? -ne 0 ]]; then
+            echo -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${destBranch} 失败，取消合并操作... \033[0m"
+            git reset --hard HEAD --
+        fi
+
+        return $?
     fi
 
-    echo "将 master 代码合并至分支 ${localBranchName}..."
-    merge_info=`git merge master 2>&1`
+    return 1
+}
 
-    if [[ $merge_info =~ "Automatic merge failed" ]]
-    then
-        echo -e "\033[31m 分支 ${localBranchName} 代码合并失败，取消合并操作... \033[0m"
-        git reset --hard HEAD --
+# 删除本地及远程分支
+functin removeLocalBranch() {
+    deleteBranch=$1
 
-        return 1
-    else
-        echo "将分支 $localBranchName 合过来的 commit 推荐至远程仓库..."
-        git push
+    echo "删除远程分支 $deleteBranch"
+    git push origin --delete $deleteBranch
 
-        return 0
+    if [[ $? -ne 0 ]]; then
+        echo -e "\033[31m 远程分支 $deleteBranch 删除失败，请稍后手动删除。 \033[0m"
     fi
+
+    echo "删除本地分支 $deleteBranch"
+    git branch -d $deleteBranch
+
+    if [[ $? -ne 0 ]]; then
+        echo -e "\033[31m 本地分支 $deleteBranch 删除失败，请稍后手动删除。 \033[0m"
+        return $?
+    fi
+    return 0
 }
 
 # 将 master 代码合并至 开发分支、测试分支、hotfix分支
@@ -49,7 +82,6 @@ function mergeIntoBranchesFromMaster() {
     echo "将 master 代码合并至所有开发及测试分支"
     remoteBranchNamePrefix='origin/'
     allRemoteBranches=$(git branch --remotes --format='%(refname:short)')
-    allLocalBranches=($(git branch --format='%(refname:short)'))
 
     successBranches=()
     failBranches=()
@@ -67,7 +99,7 @@ function mergeIntoBranchesFromMaster() {
                 read needMerge
 
                 if [[ $needMerge = "yes" ]]; then
-                    mergeIntoFromMaster $remoteBranch $localBranchName ${allLocalBranches[@]}
+                    margeLocalBranch master $localBranchName
                     if [ $? == 0 ]; then
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
@@ -112,6 +144,8 @@ function mergeIntoBranchesFromMaster() {
     return 0
 }
 
+
+
 cd $(dirname $0)/..
 
 echo "同步远程仓库..."
@@ -126,53 +160,49 @@ then
 
     if [[ $is_publish = "yes" ]]
     then
-          echo "正在升级版本号，生成更新日志 CHANGELOG.md ..."
-          npm run release --skip.tag
+        echo "正在升级版本号，生成更新日志 CHANGELOG.md ..."
+        npm run release --skip.tag
 
-          if [[ $current_branch != "master" ]]
-          then
-              echo "将当前分支 $current_branch 代码推至远程代码仓库..."
-              git push
+        # 0 表示成功
+        mergeSuccess=0
+        if [[ $current_branch != "master" ]]
+        then
+            echo "将当前分支 $current_branch 代码推至远程代码仓库..."
+            git push
 
-              echo "切至 master 分支"
-              git checkout master
+            # 将当前分支 合并至 master 分支
+            margeLocalBranch $current_branch "master"
+            mergeSuccess=$?
+        fi
 
-              echo "同步远程仓库..."
-              git pull
+        if [[ $mergeSuccess -eq 0 ]]; then
+            echo "请输入 tag 号"
+            read new_tag
 
-              echo "将刚才的分支合并至 master 分支"
-              git merge $current_branch
-          fi
+            echo "正在创建本地 tag $new_tag"
+            git tag -a $new_tag -m $new_tag
 
-          echo "请输入 tag 号"
-          read new_tag
+            echo "将代码推至远程代码仓库"
+            git push --follow-tags origin master
 
-          echo "正在创建本地 tag $new_tag"
-          git tag -a $new_tag -m $new_tag
+            if [[ $current_branch != 'master' ]]; then
+                removeLocalBranch $current_branch
+            fi
 
-          echo "将代码推至远程代码仓库"
-          git push --follow-tags origin master
+            # 将 master 代码合并至所有开发及测试分支
+            mergeIntoBranchesFromMaster
 
-          if [[ $current_branch != 'master' ]]
-          then
-              echo "删除远程分支 $current_branch"
-              git push origin --delete $current_branch
-
-              echo "删除本地分支 $current_branch"
-              git branch -d $current_branch
-          fi
-
-          # 将 master 代码合并至所有开发及测试分支
-          mergeIntoBranchesFromMaster
-
-          if [ $? == 0 ]; then
-            echo -e "\n\033[32m 发布完成 \033[0m\n"
-          else
-            echo -e "\n\033[31m 发布完成，请将合并失败的分支进行手动合并操作。 \033[0m\n"
-          fi
+            if [ $? == 0 ]; then
+                echo -e "\n\033[32m 发布完成 \033[0m\n"
+            else
+                echo -e "\n\033[31m 发布完成，请将合并失败的分支进行手动合并操作。 \033[0m\n"
+            fi
+        else
+            echo -e "\n\033[31m 发布失败：分支 $current_branch 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。 \033[0m\n"
+        fi
     else
-        echo -e "\n您取消了发布当前分支。\n"
+        echo -e "\n\033[31m 发布失败：您取消了发布当前分支。 \033[0m\n"
     fi
 else
-    echo -e "\n 请确保当前分支是干净的并且与远程代码同步，才可发布当前分支。\n"
+    echo -e "\n\033[31m 发布失败：请确保当前分支是干净的并且与远程代码同步，才可发布当前分支。 \033[0m\n"
 fi
