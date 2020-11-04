@@ -25,7 +25,7 @@ function mergeIntoFromMaster() {
     fi
 
     echo "将 master 代码合并至分支 ${localBranchName}..."
-    merge_info=`git merge master`
+    merge_info=`git merge master 2>&1`
 
     if [ $merge_info =~ "Automatic merge failed" ]
     then
@@ -54,39 +54,71 @@ function mergeIntoBranchesFromMaster() {
 
     successBranches=()
     failBranches=()
+    otherBranches=()
 
     for remoteBranch in ${allRemoteBranches[@]}; do
-      # 检查是否是 HEAD 指针
-      if [ $remoteBranch != $remoteBranchNamePrefix'HEAD' ]
-      then
-        localBranchName=${remoteBranch:${#remoteBranchNamePrefix}}
+        # 检查是否是 HEAD 指针
+        if [ $remoteBranch != $remoteBranchNamePrefix'HEAD' ]
+        then
+            localBranchName=${remoteBranch:${#remoteBranchNamePrefix}}
 
-        # 只处理 开发分支 develop/ 开头、测试分支 release/ 开头、hotfix分支 hotfix/ 开头
-        if [ ${localBranchName:0:8} = "develop/" -o ${localBranchName:0:8} = "release/" -o ${localBranchName:0:7} = "hotfix/" ]; then
+            # 只处理 开发分支 develop/ 开头、测试分支 release/ 开头、hotfix分支 hotfix/ 开头
+            if [ ${localBranchName:0:8} = "develop/" -o ${localBranchName:0:8} = "release/" -o ${localBranchName:0:7} = "hotfix/" ]; then
+                echo "是否将 master 的最新代码合并至分支 $localBranchName ？（yes, no）"
+                read needMerge
 
-            mergeIntoFromMaster $remoteBranch $localBranchName $allLocalBranches
-            if [ $? == 0 ]; then
-                successBranches[${#successBranches[*]}]=$$localBranchName
+                if [ $needMerge = "yes" ]; then
+                    mergeIntoFromMaster $remoteBranch $localBranchName $allLocalBranches
+                    if [ $? == 0 ]; then
+                        echo 'xixixixi------------xixixixi--0--'
+                        successBranches[${#successBranches[*]}]=$localBranchName
+                    else
+                        echo 'xixixixi------------xixixixi--1--'
+                        echo "稍后请手动将 master 代码合并至分支 ${localBranchName}"
+                        failBranches[${#failBranches[*]}]=$localBranchName
+                    fi
+                else
+                    otherBranches[${#otherBranches[*]}]=$localBranchName
+                fi
             else
-                echo "稍后请手动将 master 代码合并至分支 ${localBranchName}"
-                failBranches[${#failBranches[*]}]=$$localBranchName
+                otherBranches[${#otherBranches[*]}]=$localBranchName
             fi
-
         fi
-      fi
     done
 
     echo "合并成功的分支有 ${#successBranches[*]} 个，如下所示："
-    for name in $successBranches[*]; do
+    for name in ${successBranches[*]}; do
       echo $name
     done
 
-    # 打印分格
-    echo "----------------"
+    if [ ${#otherBranches[*]} > 0 ]; then
+        # 打印分格
+        echo "----------------"
 
-    echo "合并失败的分支有 ${#failBranches[*]} 个，如下所示："
-    for name in $failBranches[*]; do
-      echo $name
-    done
+        echo "没有执行合并操作的分支有 ${#otherBranches[*]} 个，如下所示："
+        for name in ${otherBranches[*]}; do
+          echo $name
+        done
+
+        return 1
+    fi
+
+    if [ ${#failBranches[*]} > 0 ]; then
+        # 打印分格
+        echo "----------------"
+
+        echo "合并失败的分支有 ${#failBranches[*]} 个，如下所示："
+        for name in ${failBranches[*]}; do
+          echo $name
+        done
+
+        return 1
+    fi
+
+    return 0
 }
+
+cd $(dirname $0)/..
+
+mergeIntoBranchesFromMaster
 

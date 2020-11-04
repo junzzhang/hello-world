@@ -26,7 +26,7 @@ function mergeIntoFromMaster() {
     fi
 
     echo "将 master 代码合并至分支 ${localBranchName}..."
-    merge_info=`git merge master`
+    merge_info=`git merge master 2>&1`
 
     if [ $merge_info =~ "Automatic merge failed" ]
     then
@@ -125,7 +125,7 @@ git pull
 status_info=`git status 2>&1`
 if [[ $status_info =~ "working tree clean" && $status_info =~ "Your branch is up to date with" ]]
 then
-    current_branch=`git branch --show-current`
+    current_branch=`git branch --show-current 2>&1`
     echo "确定要发布当前分支 $current_branch 吗？（yes, no）"
     read is_publish
 
