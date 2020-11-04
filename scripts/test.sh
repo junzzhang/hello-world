@@ -83,14 +83,14 @@ function mergeIntoBranchesFromMaster() {
         fi
     done
 
-    echo "合并成功的分支有 ${#successBranches[*]} 个，如下所示："
+    echo -e "\n 合并成功的分支有 ${#successBranches[*]} 个，如下所示："
     for name in ${successBranches[*]}; do
       echo $name
     done
 
     if [ ${#otherBranches[*]} -gt 0 ]; then
         # 打印分格
-        echo "----------------"
+        echo -e "\n ----------------"
 
         echo "没有执行合并操作的分支有 ${#otherBranches[*]} 个，如下所示："
         for name in ${otherBranches[*]}; do
@@ -102,7 +102,7 @@ function mergeIntoBranchesFromMaster() {
 
     if [ ${#failBranches[*]} -gt 0 ]; then
         # 打印分格
-        echo "----------------"
+        echo -e "\n ----------------"
 
         echo "合并失败的分支有 ${#failBranches[*]} 个，如下所示："
         for name in ${failBranches[*]}; do
@@ -169,13 +169,13 @@ then
           mergeIntoBranchesFromMaster
 
           if [ $? == 0 ]; then
-            echo "发布完成。"
+            echo -e "\n 发布完成。\n"
           else
-            echo "发布完成，请将回并失败的支持进行手动合并操作。"
+            echo -e "\n 发布完成，请将合并失败的分支进行手动合并操作。\n"
           fi
     else
-        echo "您取消了发布当前分支。"
+        echo -e "\n您取消了发布当前分支。\n"
     fi
 else
-    echo "请确保当前分支是干净的并且与远程代码同步，才可发布当前分支。"
+    echo -e "\n 请确保当前分支是干净的并且与远程代码同步，才可发布当前分支。\n"
 fi
