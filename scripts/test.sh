@@ -56,6 +56,15 @@ function margeLocalBranch() {
     return 1
 }
 
+function margeAndPushLocalBranch() {
+  margeLocalBranch $1 $2
+  result=$?
+
+  git push
+
+  return $result
+}
+
 # 删除本地及远程分支
 function removeLocalBranch() {
     deleteBranch=$1
@@ -99,7 +108,7 @@ function mergeIntoBranchesFromMaster() {
                 read needMerge
 
                 if [[ $needMerge = "yes" ]]; then
-                    margeLocalBranch master $localBranchName
+                    margeAndPushLocalBranch master $localBranchName
                     if [ $? == 0 ]; then
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
