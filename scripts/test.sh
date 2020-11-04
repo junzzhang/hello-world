@@ -110,10 +110,11 @@ function mergeIntoBranchesFromMaster() {
 
                 if [[ $needMerge = "yes" ]]; then
                     margeAndPushLocalBranch master $localBranchName
-                    echo "xixi = \"$?\""
                     if [[ $? -eq 0 ]]; then
+                        echo "xixi = \"$?\""
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
+                        echo "xixi 2= \"$?\""
                         echo -e "\033[31m 稍后请手动将 master 代码合并至分支 ${localBranchName} \033[0m"
                         failBranches[${#failBranches[*]}]=$localBranchName
                     fi
