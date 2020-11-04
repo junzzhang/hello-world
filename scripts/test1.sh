@@ -33,15 +33,11 @@ function mergeIntoFromMaster() {
         git reset --hard HEAD --
 
         return 1
-
-        # echo "稍后请手动将 master 代码合并至分支 ${localBranchName}"
-        # failBranches[${#failBranches[*]}]=$$localBranchName
     else
         echo "将分支 $localBranchName 合过来的 commit 推荐至远程仓库..."
         git push
 
         return 0
-        # successBranches[${#successBranches[*]}]=$$localBranchName
     fi
 }
 
@@ -70,10 +66,8 @@ function mergeIntoBranchesFromMaster() {
                 if [ $needMerge = "yes" ]; then
                     mergeIntoFromMaster $remoteBranch $localBranchName $allLocalBranches
                     if [ $? == 0 ]; then
-                        echo 'xixixixi------------xixixixi--0--'
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
-                        echo 'xixixixi------------xixixixi--1--'
                         echo "稍后请手动将 master 代码合并至分支 ${localBranchName}"
                         failBranches[${#failBranches[*]}]=$localBranchName
                     fi
