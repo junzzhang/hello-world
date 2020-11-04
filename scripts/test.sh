@@ -13,7 +13,7 @@ function mergeIntoFromMaster() {
         echo "迁出远程分支 ${remoteBranch}..."
         git branch --no-track $localBranchName refs/remotes/${remoteBranch}
         if [[ $? -eq 0 ]]; then
-          git branch --set-upstream-to=$remoteBranch
+          git branch --set-upstream-to=$remoteBranch $localBranchName
         fi
         echo "切到分支 ${localBranchName}..."
         git checkout $localBranchName
