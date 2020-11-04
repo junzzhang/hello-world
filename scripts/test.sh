@@ -109,6 +109,7 @@ function mergeIntoBranchesFromMaster() {
 
                 if [[ $needMerge = "yes" ]]; then
                     margeAndPushLocalBranch master $localBranchName
+                    echo "xixi = \"$?\""
                     if [[ $? -eq 0 ]]; then
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
