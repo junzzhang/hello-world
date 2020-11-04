@@ -109,7 +109,7 @@ function mergeIntoBranchesFromMaster() {
 
                 if [[ $needMerge = "yes" ]]; then
                     margeAndPushLocalBranch master $localBranchName
-                    if [ $? == 0 ]; then
+                    if [[ $? -eq 0 ]]; then
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
                         echo -e "\033[31m 稍后请手动将 master 代码合并至分支 ${localBranchName} \033[0m"
@@ -201,7 +201,7 @@ then
             # 将 master 代码合并至所有开发及测试分支
             mergeIntoBranchesFromMaster
 
-            if [ $? == 0 ]; then
+            if [[ $? -eq 0 ]]; then
                 echo -e "\n\033[32m 发布完成 \033[0m\n"
             else
                 echo -e "\n\033[31m 发布完成，请将合并失败的分支进行手动合并操作。 \033[0m\n"
