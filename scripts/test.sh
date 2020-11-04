@@ -32,7 +32,7 @@ function mergeIntoFromMaster() {
 
     if [[ $merge_info =~ "Automatic merge failed" ]]
     then
-        echo "分支 ${localBranchName} 代码合并失败，取消合并操作..."
+        echo -e "\033[31m 分支 ${localBranchName} 代码合并失败，取消合并操作... \033[0m"
         git reset --hard HEAD --
 
         return 1
@@ -71,7 +71,7 @@ function mergeIntoBranchesFromMaster() {
                     if [ $? == 0 ]; then
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
-                        echo "稍后请手动将 master 代码合并至分支 ${localBranchName}"
+                        echo -e "\033[31m 稍后请手动将 master 代码合并至分支 ${localBranchName} \033[0m"
                         failBranches[${#failBranches[*]}]=$localBranchName
                     fi
                 else
@@ -83,16 +83,15 @@ function mergeIntoBranchesFromMaster() {
         fi
     done
 
-    echo -e "\n 合并成功的分支有 ${#successBranches[*]} 个，如下所示："
+    echo -e "\n\033[32m 合并成功的分支有 ${#successBranches[*]} 个，如下所示： \033[0m\n"
     for name in ${successBranches[*]}; do
-      echo $name
+      echo -e "\033[32m $name \033[0m"
     done
 
     if [ ${#otherBranches[*]} -gt 0 ]; then
         # 打印分格
-        echo -e "\n ----------------"
-
-        echo "没有执行合并操作的分支有 ${#otherBranches[*]} 个，如下所示："
+        echo -e "\n ----------------\n"
+        echo -e "没有执行合并操作的分支有 ${#otherBranches[*]} 个，如下所示：\n"
         for name in ${otherBranches[*]}; do
           echo $name
         done
@@ -100,11 +99,11 @@ function mergeIntoBranchesFromMaster() {
 
     if [ ${#failBranches[*]} -gt 0 ]; then
         # 打印分格
-        echo -e "\n ----------------"
+        echo -e "\n ----------------\n"
 
-        echo "合并失败的分支有 ${#failBranches[*]} 个，如下所示："
+        echo -e "\033[31m 合并失败的分支有 ${#failBranches[*]} 个，如下所示： \033[0m\n"
         for name in ${failBranches[*]}; do
-          echo $name
+          echo -e "\033[31m $name \033[0m"
         done
 
         return 1
@@ -167,9 +166,9 @@ then
           mergeIntoBranchesFromMaster
 
           if [ $? == 0 ]; then
-            echo -e "\n 发布完成。\n"
+            echo -e "\n\033[32m 发布完成 \033[0m\n"
           else
-            echo -e "\n 发布完成，请将合并失败的分支进行手动合并操作。\n"
+            echo -e "\n\033[31m 发布完成，请将合并失败的分支进行手动合并操作。 \033[0m\n"
           fi
     else
         echo -e "\n您取消了发布当前分支。\n"
