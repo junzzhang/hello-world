@@ -64,7 +64,7 @@ function mergeIntoBranchesFromMaster() {
                 read needMerge
 
                 if [[ $needMerge = "yes" ]]; then
-                    mergeIntoFromMaster $remoteBranch $localBranchName ${allLocalBranches[@]}
+                    mergeIntoFromMaster $remoteBranch $localBranchName ${allLocalBranches[*]}
                     if [ $? == 0 ]; then
                         successBranches[${#successBranches[*]}]=$localBranchName
                     else
