@@ -57,7 +57,7 @@ function margeLocalBranch() {
 }
 
 # 删除本地及远程分支
-functin removeLocalBranch() {
+function removeLocalBranch() {
     deleteBranch=$1
 
     echo "删除远程分支 $deleteBranch"
