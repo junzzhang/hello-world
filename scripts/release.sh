@@ -17,10 +17,13 @@ function mergeIntoFromMaster() {
 
   local localBranchName
   for localBranchName in ${targetBranches[@]}; do
-    # local info=$(margeFrom $localBranchName master true)
-    margeFrom $localBranchName master true
+    local info=$(margeFrom $localBranchName master true)
     local mergeResult=$?
-    echo "mergeResult=$mergeResult"
+    if [[ $mergeResult -eq 0 ]]; then
+      echo $localBranchName
+    elif [[ $mergeResult -eq 2 ]]; then
+      return $mergeResult
+    fi
   done
 
   return 0
@@ -181,4 +184,6 @@ cd $(dirname $0)/..
 
 # exit 0
 
-mergeIntoFromMaster "develop/5.3.11.2"
+i=mergeIntoFromMaster "develop/5.3.11.2"
+
+echo "xixi=${i[*]}"
