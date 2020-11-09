@@ -180,6 +180,8 @@ function release_main() {
 cd $(dirname $0)/..
 
 # 执行发版操作
-release_main
+# release_main
 
-exit 0
+# exit 0
+
+mergeIntoFromMaster "develop/5.3.11.2"

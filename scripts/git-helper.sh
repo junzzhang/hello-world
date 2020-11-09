@@ -234,7 +234,7 @@ function margeFrom() {
 
   result=$?
   if [[ $result -ne 0 ]]; then
-    echo -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
+    # echo -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
     git reset --hard HEAD --
     if [[ $? -ne 0 ]]; then
       return 2
@@ -242,7 +242,6 @@ function margeFrom() {
 
     return 1
   fi
-  echo "哈哈哈哈"
 
   if [[ $isPushToOrigin == true ]]; then
     git push
