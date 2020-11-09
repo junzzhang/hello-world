@@ -35,7 +35,7 @@ function isCurrentBranchBehindOrigin() {
     return 1
   fi
 
-  if [[ -z $(echo "red greed behind  12" | grep -E "\bbehind\b\s+\d+") ]]; then
+  if [[ -z $(echo ${statusInfo} | grep -E "\bbehind\b\s+\d+") ]]; then
     echo false
   fi
 
@@ -54,7 +54,7 @@ function isCurrentBranchAheadOfOrigin() {
     return 1
   fi
 
-  if [[ -z $(echo "red greed behind  12" | grep -E "\bahead\b\s+\d+") ]]; then
+  if [[ -z $(echo ${statusInfo} | grep -E "\bahead\b\s+\d+") ]]; then
     echo false
   fi
 
