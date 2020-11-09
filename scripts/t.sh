@@ -1,15 +1,9 @@
 #!/bin/bash
 
+source ./scripts/array-helper.sh
+source ./scripts/git-helper.sh
 
-function func() {
-  return 1
-}
+current_branch="release/5.13.1.10"
+preMergeBranches=($(select_branches_for_merge "${current_branch}"))
 
-function func1() {
-  local info
-
-  info=`func`
-  echo $?
-}
-
-func1
+echo ${preMergeBranches[@]}

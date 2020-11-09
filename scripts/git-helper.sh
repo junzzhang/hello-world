@@ -409,12 +409,12 @@ function select_branches_for_merge() {
   fi
 
   for remoteBranch in ${allRemoteBranches[@]}; do
+      localBranchName=${remoteBranch:${#remoteBranchNamePrefix}}
       # 检查是否是 HEAD 指针
-      if [[ $remoteBranch = $remoteBranchNamePrefix'HEAD' || " ${excludeArray[*]} " =~ " ${remoteBranch} " ]]; then
+      if [[ $remoteBranch = $remoteBranchNamePrefix'HEAD' || " ${excludeArray[*]} " =~ " ${localBranchName} " ]]; then
         continue
       fi
 
-      localBranchName=${remoteBranch:${#remoteBranchNamePrefix}}
       # 只处理 开发分支 develop/ 开头、测试分支 release/ 开头、hotfix分支 hotfix/ 开头
       if [ ${localBranchName:0:8} = "develop/" -o ${localBranchName:0:8} = "release/" -o ${localBranchName:0:7} = "hotfix/" ]; then
         needMerge=""
