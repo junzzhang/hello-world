@@ -1,8 +1,10 @@
 #!/bin/bash
 
-function main() {
-  local i=12
-  echo $i
-}
+source ./scripts/array-helper.sh
 
-main
+targetArray=(1 2 3 4 5 6)
+removeArray=(2 5)
+
+newArr=($(differenceArray "${targetArray[*]}" "${removeArray[*]}"))
+
+echo ${newArr[*]}

@@ -9,6 +9,7 @@
 #    4. 回合代码 ：Master 分支回合至 指定的开发、测试及 hotfix 分支
 ##############################################################
 
+source ./scripts/array-helper.sh
 source ./scripts/git-helper.sh
 
 function mergeIntoFromMaster() {
@@ -151,13 +152,6 @@ function release_main() {
       fi
   fi
 
-  # 选择要回合的分支（将 master 代码合并至所有开发及测试分支）
-  # local preMergeBranches=($(select_branches_for_merge))
-  # if [[ $? -ne 0 ]]; then
-  #  echo -e "\n\033[31m 发布完成，请手动将代码从 master 分支合并到其它分支。 \033[0m\n"
-  #  return 1
-  # fi
-
   echo -e "正在回合代码..."
 
   local mergeSuccessBranches=($(mergeIntoFromMaster "${preMergeBranches[*]}"))
@@ -167,13 +161,7 @@ function release_main() {
     echo -e "\033[32m $name \033[0m"
   done
 
-  local mergeFailBranches=()
-  for name in ${preMergeBranches[*]}; do
-    if [[ ! " ${mergeSuccessBranches[*]} " =~ " ${name} " ]]; then
-      mergeFailBranches[${#mergeFailBranches[*]}]=$name
-    fi
-  done
-
+  local mergeFailBranches=($(differenceArray "${preMergeBranches[*]}", "${mergeSuccessBranches[*]}"))
   if [[ ${#mergeFailBranches[*]} -gt 0 ]]; then
     echo -e "\n\033[31m 合并失败的分支有 ${#mergeFailBranches[*]} 个，如下所示： \033[0m\n"
     for name in ${mergeFailBranches[*]}; do
