@@ -81,6 +81,11 @@ function release_main() {
     return 1
   fi
 
+  local new_tag=""
+  while [[ -z $new_tag ]]; do
+    read -p "请输入 tag 号：" new_tag
+  done
+
   # 选择要回合的分支（将 master 代码合并至所有开发及测试分支）
   local preMergeBranches=($(select_branches_for_merge))
   if [[ $? -ne 0 ]]; then
@@ -121,9 +126,6 @@ function release_main() {
       return 1
     fi
   fi
-
-  local new_tag=""
-  read -p "请输入 tag 号：" new_tag
 
   echo "正在创建本地 tag $new_tag"
   # git tag -a $new_tag -m $new_tag
