@@ -19,9 +19,9 @@ function mergeIntoFromMaster() {
     local info=$(margeFrom $localBranchName master true)
     mergeResult=$?
     if [[ $mergeResult -eq 0 ]]; then
-        echo $localBranchName
+      echo $localBranchName
     elif [[ $mergeResult -eq 2 ]]; then
-        return $mergeResult
+      return $mergeResult
     fi
   done
 
@@ -158,7 +158,7 @@ function release_main() {
 
   echo -e "正在回合代码..."
 
-  local mergeSuccessBranches=($(mergeIntoFromMaster ${preMergeBranches[@]}))
+  local mergeSuccessBranches=($(mergeIntoFromMaster "${preMergeBranches[*]}"))
   echo -e "\n\033[32m 合并成功的分支有 ${#mergeSuccessBranches[*]} 个，如下所示： \033[0m\n"
   local name=""
   for name in ${mergeSuccessBranches[*]}; do
