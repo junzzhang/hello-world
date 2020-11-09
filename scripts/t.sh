@@ -1,10 +1,8 @@
-function margeAndPushLocalBranch() {
-  result=1
+#!/bin/bash
 
-  git push
-  echo "xixi = $?"
-  return $result
+function main() {
+  local i=12
+  echo $i
 }
 
-margeAndPushLocalBranch
-echo "haha = $?"
+main
