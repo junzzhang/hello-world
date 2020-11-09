@@ -242,6 +242,7 @@ function margeFrom() {
 
     return 1
   fi
+  echo "哈哈哈哈"
 
   if [[ $isPushToOrigin == true ]]; then
     git push
