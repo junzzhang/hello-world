@@ -30,6 +30,8 @@ function mergeIntoFromMaster() {
 }
 
 function select_branches_for_merge() {
+  local excludeArray=($1)
+
   local remoteBranchNamePrefix='origin/'
   local allRemoteBranches=$(git branch --remotes --format='%(refname:short)')
 
@@ -41,7 +43,7 @@ function select_branches_for_merge() {
 
   for remoteBranch in ${allRemoteBranches[@]}; do
       # 检查是否是 HEAD 指针
-      if [[ $remoteBranch = $remoteBranchNamePrefix'HEAD' ]]; then
+      if [[ $remoteBranch = $remoteBranchNamePrefix'HEAD' || " ${excludeArray[*]} " =~ " ${remoteBranch} " ]]; then
         continue
       fi
 
@@ -64,7 +66,6 @@ function select_branches_for_merge() {
 
 function release_main() {
   local current_branch=`git branch --show-current 2>&1`
-  # echo "确定要发布当前分支 $current_branch 吗？（yes, no）"
   local is_publish=""
 
   while [[ $is_publish != "yes" && $is_publish != "no" ]]; do
@@ -88,7 +89,7 @@ function release_main() {
   done
 
   # 选择要回合的分支（将 master 代码合并至所有开发及测试分支）
-  local preMergeBranches=($(select_branches_for_merge))
+  local preMergeBranches=($(select_branches_for_merge "${current_branch}"))
   if [[ $? -ne 0 ]]; then
     echo -e "\n\033[31m 回合分支选择异常，请重新发布。 \033[0m\n"
     return 1
@@ -161,7 +162,7 @@ function release_main() {
     echo -e "\033[32m $name \033[0m"
   done
 
-  local mergeFailBranches=($(differenceArray "${preMergeBranches[*]}", "${mergeSuccessBranches[*]}"))
+  local mergeFailBranches=($(differenceArray "${preMergeBranches[*]}" "${mergeSuccessBranches[*]}"))
   if [[ ${#mergeFailBranches[*]} -gt 0 ]]; then
     echo -e "\n\033[31m 合并失败的分支有 ${#mergeFailBranches[*]} 个，如下所示： \033[0m\n"
     for name in ${mergeFailBranches[*]}; do
