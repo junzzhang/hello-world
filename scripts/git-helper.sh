@@ -210,6 +210,8 @@ function margeFrom() {
   local targetBranch=$1
   # 来源分支
   local fromBranch=$2
+  # 合并后是否执行 push 操作，默认值为 false
+  local isPushToOrigin=$3
 
   local result
 
@@ -227,23 +229,28 @@ function margeFrom() {
     return $result
   fi
 
-  if [[ $? -eq 0 ]]; then
-    # 将分支 ${fromBranch} 合并至 ${targetBranch} 分支
-    git merge --no-edit $fromBranch
+  # 将分支 ${fromBranch} 合并至 ${targetBranch} 分支
+  git merge --no-edit $fromBranch
 
-    result=$?
-    if [[ $result -ne 0 ]]; then
-      # -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
-      git reset --hard HEAD --
-      if [[ $? -ne 0 ]]; then
-        return 2
-      fi
+  result=$?
+  if [[ $result -ne 0 ]]; then
+    # -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
+    git reset --hard HEAD --
+    if [[ $? -ne 0 ]]; then
+      return 2
     fi
 
-    return 0
+    return 1
   fi
 
-  return 1
+  if [[ $isPushToOrigin == true ]]; then
+    git push
+    if [[ $? -ne 0 ]]; then
+      return 1
+    fi
+  fi
+
+  return 0
 }
 
 # 函数功能：删除本地分支
