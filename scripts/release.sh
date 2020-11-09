@@ -17,8 +17,7 @@ function mergeIntoFromMaster() {
 
   local localBranchName
   for localBranchName in ${targetBranches[@]}; do
-    # local info=$(margeFrom $localBranchName master true)
-    margeFrom $localBranchName master true
+    local info=`margeFrom $localBranchName master true`
     local mergeResult=$?
     if [[ $mergeResult -eq 0 ]]; then
       echo "xixi-1"
