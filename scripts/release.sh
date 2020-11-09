@@ -20,11 +20,7 @@ function mergeIntoFromMaster() {
     # local info=$(margeFrom $localBranchName master true)
     margeFrom $localBranchName master true
     local mergeResult=$?
-    if [[ $mergeResult -eq 0 ]]; then
-      echo $localBranchName
-    elif [[ $mergeResult -eq 2 ]]; then
-      return $mergeResult
-    fi
+    echo "mergeResult=$mergeResult"
   done
 
   return 0
