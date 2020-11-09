@@ -9,62 +9,21 @@
 #    4. 回合代码 ：Master 分支回合至 指定的开发、测试及 hotfix 分支
 ##############################################################
 
+source ./scripts/array-helper.sh
 source ./scripts/git-helper.sh
 
-function mergeIntoFromMaster() {
-  local targetBranches=($1)
-
-  local localBranchName
-  for localBranchName in ${targetBranches[@]}; do
-    local info=$(margeFrom $localBranchName master true)
-    mergeResult=$?
-    if [[ $mergeResult -eq 0 ]]; then
-      echo $localBranchName
-    elif [[ $mergeResult -eq 2 ]]; then
-      return $mergeResult
-    fi
-  done
-
-  return 0
-}
-
-function select_branches_for_merge() {
-  local remoteBranchNamePrefix='origin/'
-  local allRemoteBranches=$(git branch --remotes --format='%(refname:short)')
-
-  if [[ $? -ne 0 ]]; then
-    return 1
-  fi
-
-  local remoteBranch
-
-  for remoteBranch in ${allRemoteBranches[@]}; do
-      # 检查是否是 HEAD 指针
-      if [[ $remoteBranch = $remoteBranchNamePrefix'HEAD' ]]; then
-        continue
-      fi
-
-      local localBranchName=${remoteBranch:${#remoteBranchNamePrefix}}
-      # 只处理 开发分支 develop/ 开头、测试分支 release/ 开头、hotfix分支 hotfix/ 开头
-      if [ ${localBranchName:0:8} = "develop/" -o ${localBranchName:0:8} = "release/" -o ${localBranchName:0:7} = "hotfix/" ]; then
-        local needMerge=""
-        while [[ $needMerge != "yes" && $needMerge != "no" ]]; do
-            read -p "是否将 master 的最新代码合并至分支 $localBranchName ？（yes, no）：" needMerge
-        done
-
-        if [[ $needMerge = "yes" ]]; then
-          echo $localBranchName
-        fi
-      fi
-  done
-
-  return 0
-}
-
 function release_main() {
-  local current_branch=`git branch --show-current 2>&1`
-  # echo "确定要发布当前分支 $current_branch 吗？（yes, no）"
-  local is_publish=""
+  local current_branch
+  local is_publish
+  local isClean
+  local new_tag
+  local preMergeBranches
+  local mergeSuccessBranches
+  local mergeFailBranches
+  local name
+
+  current_branch=`git branch --show-current 2>&1`
+  is_publish=""
 
   while [[ $is_publish != "yes" && $is_publish != "no" ]]; do
     read -p "确定要发布当前分支 $current_branch 吗？（yes, no）：" is_publish
@@ -75,19 +34,19 @@ function release_main() {
     return 1
   fi
 
-  local isClean=$(isCurrentBranchClean)
+  isClean=$(isCurrentBranchClean)
   if [[ $? -ne 0 || $isClean == false ]]; then
     echo -e "\n\033[31m 发布失败：请确保当前分支是干净的并且与远程代码同步，才可发布当前分支。 \033[0m\n"
     return 1
   fi
 
-  local new_tag=""
+  new_tag=""
   while [[ -z $new_tag ]]; do
     read -p "请输入 tag 号：" new_tag
   done
 
   # 选择要回合的分支（将 master 代码合并至所有开发及测试分支）
-  local preMergeBranches=($(select_branches_for_merge))
+  preMergeBranches=($(select_branches_for_merge "${current_branch}"))
   if [[ $? -ne 0 ]]; then
     echo -e "\n\033[31m 回合分支选择异常，请重新发布。 \033[0m\n"
     return 1
@@ -119,7 +78,7 @@ function release_main() {
     fi
 
     # 将当前分支 合并至 master 分支
-    margeFrom "master" $current_branch
+    mergeFrom "master" $current_branch
 
     if [[ $? -ne 0 ]]; then
       echo -e "\n\033[31m 发布失败：分支 $current_branch 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。 \033[0m\n"
@@ -151,29 +110,16 @@ function release_main() {
       fi
   fi
 
-  # 选择要回合的分支（将 master 代码合并至所有开发及测试分支）
-  # local preMergeBranches=($(select_branches_for_merge))
-  # if [[ $? -ne 0 ]]; then
-  #  echo -e "\n\033[31m 发布完成，请手动将代码从 master 分支合并到其它分支。 \033[0m\n"
-  #  return 1
-  # fi
-
   echo -e "正在回合代码..."
 
-  local mergeSuccessBranches=($(mergeIntoFromMaster "${preMergeBranches[*]}"))
+  mergeSuccessBranches=($(mergeFromMaster "${preMergeBranches[*]}"))
   echo -e "\n\033[32m 合并成功的分支有 ${#mergeSuccessBranches[*]} 个，如下所示： \033[0m\n"
-  local name=""
+  name=""
   for name in ${mergeSuccessBranches[*]}; do
     echo -e "\033[32m $name \033[0m"
   done
 
-  local mergeFailBranches=()
-  for name in ${preMergeBranches[*]}; do
-    if [[ ! " ${mergeSuccessBranches[*]} " =~ " ${name} " ]]; then
-      mergeFailBranches[${#mergeFailBranches[*]}]=$name
-    fi
-  done
-
+  mergeFailBranches=($(differenceArray "${preMergeBranches[*]}" "${mergeSuccessBranches[*]}"))
   if [[ ${#mergeFailBranches[*]} -gt 0 ]]; then
     echo -e "\n\033[31m 合并失败的分支有 ${#mergeFailBranches[*]} 个，如下所示： \033[0m\n"
     for name in ${mergeFailBranches[*]}; do

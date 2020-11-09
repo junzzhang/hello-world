@@ -10,12 +10,15 @@
 #         0 表示成功
 #         1 表示失败
 function isCurrentBranchClean() {
-  local statusInfo=`git status -s -b`
+  local statusInfo
+  local arrStatusInfo
+
+  statusInfo=`git status -s -b`
   if [[ $? -ne 0 ]]; then
     return 1
   fi
 
-  local arrStatusInfo=(${statusInfo//\#/''})
+  arrStatusInfo=(${statusInfo//\#/''})
 
   if [[ ${#arrStatusInfo[@]} -eq 1 ]]; then
     echo true
@@ -30,12 +33,14 @@ function isCurrentBranchClean() {
 #         0 表示成功
 #         1 表示失败
 function isCurrentBranchBehindOrigin() {
-  local statusInfo=`git status -s -b`
+  local statusInfo
+
+  statusInfo=`git status -s -b`
   if [[ $? -ne 0 ]]; then
     return 1
   fi
 
-  if [[ -z $(echo "red greed behind  12" | grep -E "\bbehind\b\s+\d+") ]]; then
+  if [[ -z $(echo ${statusInfo} | grep -E "\bbehind\b\s+\d+") ]]; then
     echo false
   fi
 
@@ -49,12 +54,14 @@ function isCurrentBranchBehindOrigin() {
 #         0 表示成功
 #         1 表示失败
 function isCurrentBranchAheadOfOrigin() {
-  local statusInfo=`git status -s -b`
+  local statusInfo
+
+  statusInfo=`git status -s -b`
   if [[ $? -ne 0 ]]; then
     return 1
   fi
 
-  if [[ -z $(echo "red greed behind  12" | grep -E "\bahead\b\s+\d+") ]]; then
+  if [[ -z $(echo ${statusInfo} | grep -E "\bahead\b\s+\d+") ]]; then
     echo false
   fi
 
@@ -70,11 +77,14 @@ function isCurrentBranchAheadOfOrigin() {
 #         0 表示成功
 #         1 表示失败
 function isCurrentBranch() {
+  local targetBranch
+  local current_branch
+
   # 读取参数
-  local targetBranch=$1
+  targetBranch=$1
 
   # 获取当前分支
-  local current_branch=`git branch --show-current 2>&1`
+  current_branch=`git branch --show-current 2>&1`
 
   if [[ $? -ne 0 ]]; then
     return 1
@@ -96,11 +106,14 @@ function isCurrentBranch() {
 #         0 表示成功
 #         1 表示失败
 function existsBranch() {
+  local targetBranch
+  local targetBranchSearchResult
+
   # 读取参数
-  local targetBranch=$1
+  targetBranch=$1
 
   # 检索想要签出的本地分支
-  local targetBranchSearchResult=$(git branch -a --list ${targetBranch})
+  targetBranchSearchResult=$(git branch -a --list ${targetBranch})
   if [[ $? -ne 0 ]]; then
     return 1
   fi
@@ -123,12 +136,18 @@ function existsBranch() {
 #         1 表示失败
 #         2 表示撤销 merge 失败
 function checkoutBranch() {
+    local targetBranch
+    local isPullFromOrigin
+    local existsTargetBranch
+    local isCurrent
+    local isBehind
+
     # 读取参数
-    local targetBranch=$1
-    local isPullFromOrigin=$1
+    targetBranch=$1
+    isPullFromOrigin=$1
 
     # 检测目标本地分支是否存在
-    local existsTargetBranch=$(existsBranch $targetBranch)
+    existsTargetBranch=$(existsBranch $targetBranch)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -157,7 +176,7 @@ function checkoutBranch() {
     fi
 
     # 检测是否已经是当前活动分支
-    local isCurrent=$(isCurrentBranch $targetBranch)
+    isCurrent=$(isCurrentBranch $targetBranch)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -175,7 +194,7 @@ function checkoutBranch() {
       return 0
     fi
 
-    local isBehind=$(isCurrentBranchBehindOrigin)
+    isBehind=$(isCurrentBranchBehindOrigin)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -205,15 +224,18 @@ function checkoutBranch() {
 #         0 表示成功
 #         1 表示失败
 #         2 表示撤销 merge 失败
-function margeFrom() {
-  # 目标分支
-  local targetBranch=$1
-  # 来源分支
-  local fromBranch=$2
-  # 合并后是否执行 push 操作，默认值为 false
-  local isPushToOrigin=$3
-
+function mergeFrom() {
+  local targetBranch
+  local fromBranch
+  local isPushToOrigin
   local result
+
+  # 目标分支
+  targetBranch=$1
+  # 来源分支
+  fromBranch=$2
+  # 合并后是否执行 push 操作，默认值为 false
+  isPushToOrigin=$3
 
   # 签出源分支，并 pull
   checkoutBranch $fromBranch
@@ -234,7 +256,7 @@ function margeFrom() {
 
   result=$?
   if [[ $result -ne 0 ]]; then
-    # -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
+    # echo -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
     git reset --hard HEAD --
     if [[ $? -ne 0 ]]; then
       return 2
@@ -253,15 +275,46 @@ function margeFrom() {
   return 0
 }
 
+# 函数功能：将 master 分支合并至目标分支
+# 输入参数：
+#         targetBranches - 目标分支数组
+# 返回值：
+#         0 表示成功
+#         1 表示失败
+#         2 表示撤销 merge 失败
+function mergeFromMaster() {
+  local targetBranches
+  local localBranchName
+  local info
+  local mergeResult
+
+  targetBranches=($1)
+
+  for localBranchName in ${targetBranches[@]}; do
+    info=$(mergeFrom $localBranchName master true)
+    mergeResult=$?
+    if [[ $mergeResult -eq 0 ]]; then
+      echo $localBranchName
+    elif [[ $mergeResult -eq 2 ]]; then
+      return $mergeResult
+    fi
+  done
+
+  return 0
+}
+
 # 函数功能：删除本地分支
 # 输入参数：
 #         targetBranch - 目标分支
 # 返回值：
 #         0 表示成功
 function removeLocalBranch() {
-    local targetBranch=$1
+    local targetBranch
+    local existsBranch
 
-    local existsBranch=$(existsBranch $targetBranch)
+    targetBranch=$1
+
+    existsBranch=$(existsBranch $targetBranch)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -282,9 +335,11 @@ function removeLocalBranch() {
 # 返回值：
 #         0 表示成功
 function removeRemoteBranch() {
-    local targetBranch=$1
+    local targetBranch
+    local existsBranch
 
-    local existsBranch=$(existsBranch origin/$targetBranch)
+    targetBranch=$1
+    existsBranch=$(existsBranch origin/$targetBranch)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -308,13 +363,17 @@ function removeRemoteBranch() {
 #         2 表示本也分支删除失败
 #         4 表示本地和远程分支都删除失败
 function removeBranch() {
-    local targetBranch=$1
+    local targetBranch
+    local deleteRemoteResult
+    local deleteLocalResult
+
+    targetBranch=$1
 
     removeRemoteBranch targetBranch
-    local deleteRemoteResult=$?
+    deleteRemoteResult=$?
 
     removeLocalBranch targetBranch
-    local deleteLocalResult=$?
+    deleteLocalResult=$?
 
     if [[ $deleteLocalResult == 1 && $deleteRemoteResult == 1 ]]; then
       return 4
@@ -325,4 +384,49 @@ function removeBranch() {
     else
       return 0
     fi
+}
+
+# 函数功能：选择要回合的分支
+# 输入参数：
+#         excludeArray - 不能被选上的分支列表
+# 返回值：
+#         0 表示成功
+#         1 表示远程分支删除失败
+function select_branches_for_merge() {
+  local excludeArray
+  local remoteBranchNamePrefix
+  local allRemoteBranches
+  local remoteBranch
+  local localBranchName
+  local needMerge
+
+  excludeArray=($1)
+
+  remoteBranchNamePrefix='origin/'
+  allRemoteBranches=$(git branch --remotes --format='%(refname:short)')
+  if [[ $? -ne 0 ]]; then
+    return 1
+  fi
+
+  for remoteBranch in ${allRemoteBranches[@]}; do
+      localBranchName=${remoteBranch:${#remoteBranchNamePrefix}}
+      # 检查是否是 HEAD 指针
+      if [[ $remoteBranch = $remoteBranchNamePrefix'HEAD' || " ${excludeArray[*]} " =~ " ${localBranchName} " ]]; then
+        continue
+      fi
+
+      # 只处理 开发分支 develop/ 开头、测试分支 release/ 开头、hotfix分支 hotfix/ 开头
+      if [ ${localBranchName:0:8} = "develop/" -o ${localBranchName:0:8} = "release/" -o ${localBranchName:0:7} = "hotfix/" ]; then
+        needMerge=""
+        while [[ $needMerge != "yes" && $needMerge != "no" ]]; do
+            read -p "是否将 master 的最新代码合并至分支 $localBranchName ？（yes, no）：" needMerge
+        done
+
+        if [[ $needMerge = "yes" ]]; then
+          echo $localBranchName
+        fi
+      fi
+  done
+
+  return 0
 }

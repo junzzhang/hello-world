@@ -1,8 +1,9 @@
 #!/bin/bash
 
-function main() {
-  local i=12
-  echo $i
-}
+source ./scripts/array-helper.sh
+source ./scripts/git-helper.sh
 
-main
+current_branch="release/5.13.1.10"
+preMergeBranches=($(select_branches_for_merge "${current_branch}"))
+
+echo ${preMergeBranches[@]}
