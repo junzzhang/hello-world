@@ -197,10 +197,6 @@ function release_main() {
 cd $(dirname $0)/..
 
 # 执行发版操作
-# release_main
+release_main
 
-# exit 0
-
-i=$(mergeIntoFromMaster "develop/5.3.11.2")
-
-echo "xixi=${i[*]}"
+exit 0

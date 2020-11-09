@@ -2,8 +2,14 @@
 
 
 function func() {
-  return 0
+  return 1
 }
 
-info=$(func)
-echo $?
+function func1() {
+  local info
+
+  info=`func`
+  echo $?
+}
+
+func1
