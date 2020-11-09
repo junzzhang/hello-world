@@ -184,6 +184,6 @@ cd $(dirname $0)/..
 
 # exit 0
 
-i=mergeIntoFromMaster "develop/5.3.11.2"
+i=$(mergeIntoFromMaster "develop/5.3.11.2")
 
 echo "xixi=${i[*]}"
