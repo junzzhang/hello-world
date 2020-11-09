@@ -10,12 +10,15 @@
 #         0 表示成功
 #         1 表示失败
 function isCurrentBranchClean() {
-  local statusInfo=`git status -s -b`
+  local statusInfo
+  local arrStatusInfo
+
+  statusInfo=`git status -s -b`
   if [[ $? -ne 0 ]]; then
     return 1
   fi
 
-  local arrStatusInfo=(${statusInfo//\#/''})
+  arrStatusInfo=(${statusInfo//\#/''})
 
   if [[ ${#arrStatusInfo[@]} -eq 1 ]]; then
     echo true
@@ -30,7 +33,9 @@ function isCurrentBranchClean() {
 #         0 表示成功
 #         1 表示失败
 function isCurrentBranchBehindOrigin() {
-  local statusInfo=`git status -s -b`
+  local statusInfo
+
+  statusInfo=`git status -s -b`
   if [[ $? -ne 0 ]]; then
     return 1
   fi
@@ -49,7 +54,9 @@ function isCurrentBranchBehindOrigin() {
 #         0 表示成功
 #         1 表示失败
 function isCurrentBranchAheadOfOrigin() {
-  local statusInfo=`git status -s -b`
+  local statusInfo
+
+  statusInfo=`git status -s -b`
   if [[ $? -ne 0 ]]; then
     return 1
   fi
@@ -70,11 +77,14 @@ function isCurrentBranchAheadOfOrigin() {
 #         0 表示成功
 #         1 表示失败
 function isCurrentBranch() {
+  local targetBranch
+  local current_branch
+
   # 读取参数
-  local targetBranch=$1
+  targetBranch=$1
 
   # 获取当前分支
-  local current_branch=`git branch --show-current 2>&1`
+  current_branch=`git branch --show-current 2>&1`
 
   if [[ $? -ne 0 ]]; then
     return 1
@@ -96,11 +106,14 @@ function isCurrentBranch() {
 #         0 表示成功
 #         1 表示失败
 function existsBranch() {
+  local targetBranch
+  local targetBranchSearchResult
+
   # 读取参数
-  local targetBranch=$1
+  targetBranch=$1
 
   # 检索想要签出的本地分支
-  local targetBranchSearchResult=$(git branch -a --list ${targetBranch})
+  targetBranchSearchResult=$(git branch -a --list ${targetBranch})
   if [[ $? -ne 0 ]]; then
     return 1
   fi
@@ -123,12 +136,18 @@ function existsBranch() {
 #         1 表示失败
 #         2 表示撤销 merge 失败
 function checkoutBranch() {
+    local targetBranch
+    local isPullFromOrigin
+    local existsTargetBranch
+    local isCurrent
+    local isBehind
+
     # 读取参数
-    local targetBranch=$1
-    local isPullFromOrigin=$1
+    targetBranch=$1
+    isPullFromOrigin=$1
 
     # 检测目标本地分支是否存在
-    local existsTargetBranch=$(existsBranch $targetBranch)
+    existsTargetBranch=$(existsBranch $targetBranch)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -157,7 +176,7 @@ function checkoutBranch() {
     fi
 
     # 检测是否已经是当前活动分支
-    local isCurrent=$(isCurrentBranch $targetBranch)
+    isCurrent=$(isCurrentBranch $targetBranch)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -175,7 +194,7 @@ function checkoutBranch() {
       return 0
     fi
 
-    local isBehind=$(isCurrentBranchBehindOrigin)
+    isBehind=$(isCurrentBranchBehindOrigin)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -206,14 +225,17 @@ function checkoutBranch() {
 #         1 表示失败
 #         2 表示撤销 merge 失败
 function margeFrom() {
-  # 目标分支
-  local targetBranch=$1
-  # 来源分支
-  local fromBranch=$2
-  # 合并后是否执行 push 操作，默认值为 false
-  local isPushToOrigin=$3
-
+  local targetBranch
+  local fromBranch
+  local isPushToOrigin
   local result
+
+  # 目标分支
+  targetBranch=$1
+  # 来源分支
+  fromBranch=$2
+  # 合并后是否执行 push 操作，默认值为 false
+  isPushToOrigin=$3
 
   # 签出源分支，并 pull
   checkoutBranch $fromBranch
@@ -259,9 +281,12 @@ function margeFrom() {
 # 返回值：
 #         0 表示成功
 function removeLocalBranch() {
-    local targetBranch=$1
+    local targetBranch
+    local existsBranch
 
-    local existsBranch=$(existsBranch $targetBranch)
+    targetBranch=$1
+
+    existsBranch=$(existsBranch $targetBranch)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -282,9 +307,11 @@ function removeLocalBranch() {
 # 返回值：
 #         0 表示成功
 function removeRemoteBranch() {
-    local targetBranch=$1
+    local targetBranch
+    local existsBranch
 
-    local existsBranch=$(existsBranch origin/$targetBranch)
+    targetBranch=$1
+    existsBranch=$(existsBranch origin/$targetBranch)
     if [[ $? -ne 0 ]]; then
       return 1
     fi
@@ -308,13 +335,17 @@ function removeRemoteBranch() {
 #         2 表示本也分支删除失败
 #         4 表示本地和远程分支都删除失败
 function removeBranch() {
-    local targetBranch=$1
+    local targetBranch
+    local deleteRemoteResult
+    local deleteLocalResult
+
+    targetBranch=$1
 
     removeRemoteBranch targetBranch
-    local deleteRemoteResult=$?
+    deleteRemoteResult=$?
 
     removeLocalBranch targetBranch
-    local deleteLocalResult=$?
+    deleteLocalResult=$?
 
     if [[ $deleteLocalResult == 1 && $deleteRemoteResult == 1 ]]; then
       return 4

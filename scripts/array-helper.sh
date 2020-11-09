@@ -12,10 +12,13 @@
 #         0 表示成功
 #         1 表示失败
 function differenceArray() {
-  local targetArray=($1)
-  local removeArray=($2)
-
+  local targetArray
+  local removeArray
   local item
+
+  targetArray=($1)
+  removeArray=($2)
+
   for item in ${targetArray[@]}; do
     if [[ ! " ${removeArray[*]} " =~ " ${item} " ]]; then
       echo $item
