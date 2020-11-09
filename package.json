@@ -1,6 +1,6 @@
 {
   "name": "hello-world",
-  "version": "1.29.0",
+  "version": "1.31.0",
   "description": "one test app for react research",
   "main": "app.js",
   "scripts": {
