@@ -173,7 +173,7 @@ function release_main() {
   done
 
   if [[ ${#mergeFailBranches[*]} -gt 0 ]]; then
-    echo -e "\033[31m 合并失败的分支有 ${#mergeFailBranches[*]} 个，如下所示： \033[0m\n"
+    echo -e "\n\033[31m 合并失败的分支有 ${#mergeFailBranches[*]} 个，如下所示： \033[0m\n"
     for name in ${mergeFailBranches[*]}; do
       echo -e "\033[31m $name \033[0m"
     done
