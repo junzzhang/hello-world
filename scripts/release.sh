@@ -12,66 +12,6 @@
 source ./scripts/array-helper.sh
 source ./scripts/git-helper.sh
 
-function mergeIntoFromMaster() {
-  local targetBranches
-  local localBranchName
-  local info
-  local mergeResult
-
-  targetBranches=($1)
-
-  for localBranchName in ${targetBranches[@]}; do
-    info=$(margeFrom $localBranchName master true)
-    mergeResult=$?
-    if [[ $mergeResult -eq 0 ]]; then
-      echo $localBranchName
-    elif [[ $mergeResult -eq 2 ]]; then
-      return $mergeResult
-    fi
-  done
-
-  return 0
-}
-
-function select_branches_for_merge() {
-  local excludeArray
-  local remoteBranchNamePrefix
-  local allRemoteBranches
-  local remoteBranch
-  local localBranchName
-  local needMerge
-
-  excludeArray=($1)
-
-  remoteBranchNamePrefix='origin/'
-  allRemoteBranches=$(git branch --remotes --format='%(refname:short)')
-  if [[ $? -ne 0 ]]; then
-    return 1
-  fi
-
-  for remoteBranch in ${allRemoteBranches[@]}; do
-      # 检查是否是 HEAD 指针
-      if [[ $remoteBranch = $remoteBranchNamePrefix'HEAD' || " ${excludeArray[*]} " =~ " ${remoteBranch} " ]]; then
-        continue
-      fi
-
-      localBranchName=${remoteBranch:${#remoteBranchNamePrefix}}
-      # 只处理 开发分支 develop/ 开头、测试分支 release/ 开头、hotfix分支 hotfix/ 开头
-      if [ ${localBranchName:0:8} = "develop/" -o ${localBranchName:0:8} = "release/" -o ${localBranchName:0:7} = "hotfix/" ]; then
-        needMerge=""
-        while [[ $needMerge != "yes" && $needMerge != "no" ]]; do
-            read -p "是否将 master 的最新代码合并至分支 $localBranchName ？（yes, no）：" needMerge
-        done
-
-        if [[ $needMerge = "yes" ]]; then
-          echo $localBranchName
-        fi
-      fi
-  done
-
-  return 0
-}
-
 function release_main() {
   local current_branch
   local is_publish
@@ -138,7 +78,7 @@ function release_main() {
     fi
 
     # 将当前分支 合并至 master 分支
-    margeFrom "master" $current_branch
+    mergeFrom "master" $current_branch
 
     if [[ $? -ne 0 ]]; then
       echo -e "\n\033[31m 发布失败：分支 $current_branch 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。 \033[0m\n"
@@ -172,7 +112,7 @@ function release_main() {
 
   echo -e "正在回合代码..."
 
-  mergeSuccessBranches=($(mergeIntoFromMaster "${preMergeBranches[*]}"))
+  mergeSuccessBranches=($(mergeFromMaster "${preMergeBranches[*]}"))
   echo -e "\n\033[32m 合并成功的分支有 ${#mergeSuccessBranches[*]} 个，如下所示： \033[0m\n"
   name=""
   for name in ${mergeSuccessBranches[*]}; do
