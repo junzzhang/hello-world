@@ -7,7 +7,8 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec('bash ./scripts/git-helper.sh --current-branch', (error, stdout, stderr) => {
                 if (error) {
-                    return reject((stderr || error.message));
+                    // error.code
+                    return reject(new Error("获取当前分支名时出错。"));
                 }
                 resolve(stdout.replace(/^\s+|\s+$/, ''));
             })
