@@ -14,17 +14,43 @@ source ./scripts/git-utils.sh
 
 function release_main() {
   local current_branch
+  local is_publish
+  local isClean
   local new_tag
-  local new_tag_message
   local preMergeBranches
   local mergeSuccessBranches
   local mergeFailBranches
   local name
 
-  current_branch=$1
-  new_tag=$2
-  new_tag_message=$3
-  preMergeBranches=($4)
+  current_branch=`git branch --show-current 2>&1`
+  is_publish=""
+
+  while [[ $is_publish != "yes" && $is_publish != "no" ]]; do
+    read -p "确定要发布当前分支 $current_branch 吗？（yes, no）：" is_publish
+  done
+
+  if [[ $is_publish = "no" ]]; then
+    echo -e "\n\033[31m 发布失败：您取消了发布当前分支。 \033[0m\n"
+    return 1
+  fi
+
+  isClean=$(isCurrentBranchClean)
+  if [[ $? -ne 0 || $isClean == false ]]; then
+    echo -e "\n\033[31m 发布失败：请确保当前分支是干净的并且与远程代码同步，才可发布当前分支。 \033[0m\n"
+    return 1
+  fi
+
+  new_tag=""
+  while [[ -z $new_tag ]]; do
+    read -p "请输入 tag 号：" new_tag
+  done
+
+  # 选择要回合的分支（将 master 代码合并至所有开发及测试分支）
+  preMergeBranches=($(select_branches_for_merge "${current_branch}"))
+  if [[ $? -ne 0 ]]; then
+    echo -e "\n\033[31m 回合分支选择异常，请重新发布。 \033[0m\n"
+    return 1
+  fi
 
   echo "更新远程仓库状态..."
   git pull
@@ -34,7 +60,7 @@ function release_main() {
   fi
 
   echo "正在升级版本号，生成更新日志 CHANGELOG.md ..."
-  npm run standard-version
+  standard-version --skip.tag
 
   if [[ $? -ne 0 ]]; then
     echo -e "\n\033[31m 发布失败：升级版本号，生成更新日志失败，解决完此问题，可重新发布。 \033[0m\n"
@@ -63,7 +89,7 @@ function release_main() {
   echo "正在创建本地 tag $new_tag"
   # git tag -a $new_tag -m $new_tag
   # 下面一行省略了 -m $new_tag，则强制弹出 tag 备注信息输入文本框
-  git tag -a $new_tag -m $new_tag_message
+  git tag -a $new_tag
 
   echo "将代码推至远程代码仓库"
   git push --follow-tags origin master
@@ -111,6 +137,6 @@ function release_main() {
 cd $(dirname $0)/..
 
 # 执行发版操作
-release_main $1 $2 "$3" "$4"
+release_main
 
 exit 0
