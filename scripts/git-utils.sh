@@ -31,12 +31,15 @@ function pullCurrentBranch() {
   git pull
 
   if [[ $? -ne 0 ]]; then
+    echo "xixix-1--" >&2
     git reset --hard HEAD --
     if [[ $? -ne 0 ]]; then
+      echo "xixix-2--" >&2
       echo false >&2
       return 2
     fi
 
+    echo "xixix-3--" >&2
     echo false >&2
     return 1
   fi

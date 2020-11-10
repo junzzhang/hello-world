@@ -37,6 +37,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec('bash ./scripts/git-helper.sh --pull-current-branch', (error, stdout, stderr) => {
                 if (error) {
+                    console.log(stderr);
                     return reject(false);
                 }
                 resolve(stdout.replace(/^\s+|\s+$/, '') === "true");
