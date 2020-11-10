@@ -101,6 +101,7 @@ async function start() {
             throw new Error(`当前分支 ${currentBranch} 代码没有成功推入远程仓库，接下来你最好手动进行发版操作。`);
         }
 
+        logTips(`将当前分支 ${currentBranch} 合并至 master 分支`)
         if ((await mergeFrom("master", currentBranch)) !== 0) {
             throw new Error(`分支 ${currentBranch} 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。`)
         }

@@ -296,7 +296,6 @@ function mergeFrom() {
   result=$?
   if [[ $result -ne 0 ]]; then
     echo $result >&2
-    echo false
     return $result
   fi
 
@@ -305,7 +304,6 @@ function mergeFrom() {
   result=$?
   if [[ $result -ne 0 ]]; then
     echo $result >&2
-    echo false
     return $result
   fi
 
@@ -318,12 +316,10 @@ function mergeFrom() {
     info=$(git reset --hard HEAD --)
     if [[ $? -ne 0 ]]; then
       echo 2 >&2
-      echo false
       return 2
     fi
 
     echo 1 >&2
-    echo false
     return 1
   fi
 
@@ -331,7 +327,6 @@ function mergeFrom() {
     info=$(git push)
     if [[ $? -ne 0 ]]; then
       echo 1 >&2
-      echo false
       return 1
     fi
   fi
