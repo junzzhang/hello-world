@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "standard-version": "standard-version --skip.tag",
-    "release": "bash ./scripts/release.js"
+    "release": "node ./scripts/release.js"
   },
   "repository": {
     "type": "git",
