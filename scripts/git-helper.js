@@ -84,7 +84,7 @@ module.exports = {
                 if (error) {
                     return reject(new Error(`Tag ${tag} 创建时错误。`));
                 }
-                exec(cmd, (error, stdout, stderr) => {
+                exec("git push --follow-tags origin master", (error, stdout, stderr) => {
                     if (error) {
                         return reject(new Error(`Tag ${tag} 创建时错误。`));
                     }
