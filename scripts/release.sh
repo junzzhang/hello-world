@@ -14,24 +14,13 @@ source ./scripts/git-utils.sh
 
 function release_main() {
   local current_branch
-  local new_tag
-  local new_tag_message
   local preMergeBranches
   local mergeSuccessBranches
   local mergeFailBranches
   local name
 
   current_branch=$1
-  new_tag=$2
-  new_tag_message=$3
-  preMergeBranches=($4)
-
-
-
-  echo "正在创建本地 tag $new_tag"
-  # git tag -a $new_tag -m $new_tag
-  # 下面一行省略了 -m $new_tag，则强制弹出 tag 备注信息输入文本框
-  git tag -a $new_tag -m "${new_tag_message}"
+  preMergeBranches=($2)
 
   echo "将代码推至远程代码仓库"
   git push --follow-tags origin master
@@ -79,6 +68,6 @@ function release_main() {
 cd $(dirname $0)/..
 
 # 执行发版操作
-release_main $1 $2 "$3" "$4"
+release_main $1 "$2"
 
 exit 0

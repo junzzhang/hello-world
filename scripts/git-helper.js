@@ -74,12 +74,25 @@ module.exports = {
             })
         })
     },
-    async release(currentBranch, tagName, tagDescription, mergeBackBranches) {
+    async createLocalTag(tag, tagDescription) {
+        return new Promise((resolve, reject) => {
+            // const strTagDescription = tagDescription.replace(/\n/g, "\\n");
+            const strDesc = (tagDescription || tag).replace(/\"/g, "\\\"").replace(/\n/g, '" -m "');
+            const cmd = `git tag -a ${tag} -m "${strDesc}"`;
+
+            exec(cmd, (error, stdout, stderr) => {
+                if (error) {
+                    return reject(new Error(`Tag ${tag} 创建时错误。`));
+                }
+                resolve(true);
+            })
+        })
+    },
+    async release(currentBranch, mergeBackBranches) {
         return new Promise((resolve, reject) => {
             const strMergeBackBranches = mergeBackBranches.join(" ");
-            const strTagDescription = tagDescription.replace(/\"/g, "\\\"").replace(/\n/g, "\\n");
 
-            const ll = exec(`bash ./scripts/release.sh ${currentBranch} ${tagName} "${strTagDescription}" "${strMergeBackBranches}"`, (error, stdout, stderr) => {
+            const ll = exec(`bash ./scripts/release.sh ${currentBranch} "${strMergeBackBranches}"`, (error, stdout, stderr) => {
                 if (error) {
                     return reject((stderr || error.message));
                 }
