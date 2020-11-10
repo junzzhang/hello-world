@@ -26,6 +26,12 @@ if [[ $# -gt 0 ]]; then
       --merge-from)
         mergeFrom $2 $3 $4
         ;;
+      --remove-remote-branch)
+        removeRemoteBranch $2
+        ;;
+      --remove-local-branch)
+        removeLocalBranch $2
+        ;;
       --standard-version)
         standardVersion
         ;;

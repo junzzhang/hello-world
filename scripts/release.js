@@ -9,6 +9,8 @@ const {
     mergeFrom,
     standardVersion,
     createLocalTag,
+    removeRemoteBranch,
+    removeLocalBranch,
     release
 } = require('./git-helper');
 
@@ -112,7 +114,19 @@ async function start() {
         throw new Error(`创建本地 tag ${tagName} 失败；接下来你最好手动进行发版操作。`);
     }
 
-    await release(currentBranch, mergeBackBranches);
+    if (currentBranch !== "master") {
+        logTips(`删除远程分支 ${currentBranch}...`);
+        if (!(await removeRemoteBranch(currentBranch))) {
+            throw new Error(`远程分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`);
+        }
+
+        logTips(`删除本地分支 ${currentBranch} 合并至 master 分支`)
+        if (!(await removeLocalBranch(currentBranch))) {
+            throw new Error(`本地分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`)
+        }
+    }
+
+    await release(mergeBackBranches);
 }
 
 start().catch(err => {
