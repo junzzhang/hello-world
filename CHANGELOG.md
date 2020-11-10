@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.45.0](https://github.com/junzzhang/hello-world/compare/v1.1.6...v1.45.0) (2020-11-10)
+
+
+### Features
+
+* change for test ([2b37407](https://github.com/junzzhang/hello-world/commit/2b37407203d6648fbea8e3d592e47c9a4526dd29))
+* enhance test.h ([c8bedd2](https://github.com/junzzhang/hello-world/commit/c8bedd2ec4014a764e7bb5c55713b5c83976f081))
+
+
+### Bug Fixes
+
+* a bug ([25f9a25](https://github.com/junzzhang/hello-world/commit/25f9a25118ac9b10d2033feb9b7d571393d81227))
+* one bug. ([c1f202b](https://github.com/junzzhang/hello-world/commit/c1f202ba8f32be7697239b5c97d0967518b1d2bf))
+* one bug. ([8a3b78f](https://github.com/junzzhang/hello-world/commit/8a3b78f38d3799f63e673a60c5a2ea0d51457d42))
+* one bug. ([0d4c24c](https://github.com/junzzhang/hello-world/commit/0d4c24c35d9c9092b34db4783f8eced731392952))
+* test.sh 脚本错误 ([acbf03e](https://github.com/junzzhang/hello-world/commit/acbf03eadf23abe33e902adb14e0d076c2122890))
+* test.sh 脚本错误 ([d4300e5](https://github.com/junzzhang/hello-world/commit/d4300e56efec41b70b77376a2e0f28663910fef7))
+* test.sh 脚本错误 ([8aafddc](https://github.com/junzzhang/hello-world/commit/8aafddcc2fb574577e78ba88f6b3f2eb9b94bf9a))
+* test.sh 脚本错误 ([1ca13db](https://github.com/junzzhang/hello-world/commit/1ca13db939b3bb84d26f0a0096d0ffcc9f40aa1e))
+* test.sh 脚本错误 ([6d3c5cf](https://github.com/junzzhang/hello-world/commit/6d3c5cffcdb6fa7f8cd6f4f699e8d7333252487c))
+* test.sh 脚本错误 ([bfe39f3](https://github.com/junzzhang/hello-world/commit/bfe39f3694014bb7f267123fee5012e5f7b93c8e))
+* test.sh 脚本错误 ([de010b5](https://github.com/junzzhang/hello-world/commit/de010b585ccad976e2c05e92620cf3cccc2ccf09))
+* test.sh 脚本错误 ([7501f81](https://github.com/junzzhang/hello-world/commit/7501f814c5632e36bbd6c9bff23f5ef2426e3033))
+* test.sh 脚本错误 ([b8e0e80](https://github.com/junzzhang/hello-world/commit/b8e0e80ae2c6c7ad130c881073cbca74bed71ed9))
+* test.sh 脚本错误 ([a317eef](https://github.com/junzzhang/hello-world/commit/a317eefdc97a9e5891dfe132c422047a47d88b8f))
+* test.sh 脚本错误 ([1055ea8](https://github.com/junzzhang/hello-world/commit/1055ea8ee90a807aebe96c7e6ffa5a5a7c8f454d))
+* test.sh 脚本错误 ([07882eb](https://github.com/junzzhang/hello-world/commit/07882eb71f0ca84bf3a85ce9d1adaa7c9884d96f))
+* test.sh 脚本错误 ([a327ef3](https://github.com/junzzhang/hello-world/commit/a327ef36e9bdde0ddf06cfaa3d66dfea53a242e4))
+* test.sh 脚本错误 ([b9a437f](https://github.com/junzzhang/hello-world/commit/b9a437fbd6bb051c2995725d6231792703ee30c8))
+* 修复合完代码没有 push 的问题 ([73b8010](https://github.com/junzzhang/hello-world/commit/73b8010aaafd14fd308185eb54c50592af210bce))
+* 修复语法错误 ([9760aa8](https://github.com/junzzhang/hello-world/commit/9760aa83905fb052db94952157d5cf18068ee0aa))
+* 没有合并成功的分支没有总结提示出来 ([9f71b52](https://github.com/junzzhang/hello-world/commit/9f71b52e9c58bfedd42739382c86826f66553f61))
+* 没有合并成功的分支没有总结提示出来 ([fd35e55](https://github.com/junzzhang/hello-world/commit/fd35e55830f2ee2d455b7b7a13d89cf134d8ef86))
+
 ## [1.44.0](https://github.com/junzzhang/hello-world/compare/v1.1.6...v1.44.0) (2020-11-10)
 
 
