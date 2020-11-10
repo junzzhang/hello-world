@@ -34,7 +34,7 @@ function release_main() {
     fi
 
     echo "正在升级版本号，生成更新日志 CHANGELOG.md ..."
-    standard-version --skip.tag
+    npm run standard-version
 
     if [[ $? -ne 0 ]]; then
       echo -e "\n\033[31m 发布失败：升级版本号，生成更新日志失败，解决完此问题，可重新发布。 \033[0m\n"
