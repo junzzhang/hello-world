@@ -63,7 +63,7 @@ function release_main() {
   echo "正在创建本地 tag $new_tag"
   # git tag -a $new_tag -m $new_tag
   # 下面一行省略了 -m $new_tag，则强制弹出 tag 备注信息输入文本框
-  git tag -a $new_tag -m $new_tag_message
+  git tag -a $new_tag -m $new_tag
 
   echo "将代码推至远程代码仓库"
   git push --follow-tags origin master
