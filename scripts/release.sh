@@ -13,25 +13,12 @@ source ./scripts/array-utils.sh
 source ./scripts/git-utils.sh
 
 function release_main() {
-  local current_branch
   local preMergeBranches
   local mergeSuccessBranches
   local mergeFailBranches
   local name
 
-  current_branch=$1
-  preMergeBranches=($2)
-
-  if [[ $current_branch != 'master' ]]; then
-      removeRemoteBranch $current_branch
-      if [[ $? -ne 0 ]]; then
-        echo -e "\033[31m 远程分支 $current_branch 删除失败，稍后请稍后手动删除。 \033[0m"
-      fi
-      removeLocalBranch $current_branch
-      if [[ $? -ne 0 ]]; then
-        echo -e "\033[31m 本地分支 $current_branch 删除失败，稍后请稍后手动删除。 \033[0m"
-      fi
-  fi
+  preMergeBranches=($1)
 
   echo -e "正在回合代码..."
 
@@ -60,6 +47,6 @@ function release_main() {
 cd $(dirname $0)/..
 
 # 执行发版操作
-release_main $1 "$2"
+release_main "$1"
 
 exit 0

@@ -54,6 +54,20 @@ module.exports = {
             })
         })
     },
+    async removeRemoteBranch(localBranchName) {
+        return new Promise((resolve, reject) => {
+            exec(`bash ./scripts/git-helper.sh --remove-remote-branch ${localBranchName}`, (error, stdout, stderr) => {
+                resolve(error ? false : true);
+            })
+        })
+    },
+    async removeLocalBranch(localBranchName) {
+        return new Promise((resolve, reject) => {
+            exec(`bash ./scripts/git-helper.sh --remove-local-branch ${localBranchName}`, (error, stdout, stderr) => {
+                resolve(error ? false : true);
+            })
+        })
+    },
     async mergeFrom(to, from, isPushToOrigin) {
         return new Promise((resolve, reject) => {
             exec(`bash ./scripts/git-helper.sh --merge-from ${to} ${from} ${isPushToOrigin || false}`, (error, stdout, stderr) => {
@@ -99,11 +113,11 @@ module.exports = {
             })
         })
     },
-    async release(currentBranch, mergeBackBranches) {
+    async release(mergeBackBranches) {
         return new Promise((resolve, reject) => {
             const strMergeBackBranches = mergeBackBranches.join(" ");
 
-            const ll = exec(`bash ./scripts/release.sh ${currentBranch} "${strMergeBackBranches}"`, (error, stdout, stderr) => {
+            const ll = exec(`bash ./scripts/release.sh "${strMergeBackBranches}"`, (error, stdout, stderr) => {
                 if (error) {
                     return reject((stderr || error.message));
                 }
