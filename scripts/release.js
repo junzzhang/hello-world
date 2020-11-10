@@ -71,7 +71,7 @@ async function start() {
 
     const { tagName, tagDescription, mergeBackBranches } = await inquirer.prompt(questions);
 
-    return release(currentBranch, tagName, tagDescription, mergeBackBranches);
+    await release(currentBranch, tagName, tagDescription, mergeBackBranches);
 }
 
 start().catch(err => {
