@@ -27,19 +27,18 @@ function getCurrentBranch() {
 #         1 表示失败
 #         2 表示撤销 merge 失败
 function pullCurrentBranch() {
+  local info
+
   # 同步远程仓库...
-  git pull
+  info=$(git pull)
 
   if [[ $? -ne 0 ]]; then
-    echo "xixix-1--" >&2
-    git reset --hard HEAD --
+    info=$(git reset --hard HEAD --)
     if [[ $? -ne 0 ]]; then
-      echo "xixix-2--" >&2
       echo false >&2
       return 2
     fi
 
-    echo "xixix-3--" >&2
     echo false >&2
     return 1
   fi
@@ -53,8 +52,10 @@ function pullCurrentBranch() {
 #         0 表示成功
 #         1 表示失败
 function pushCurrentBranch() {
+  local info
+
   # 同步远程仓库...
-  git push
+  info=$(git push)
 
   if [[ $? -ne 0 ]]; then
     echo false
@@ -281,6 +282,7 @@ function mergeFrom() {
   local fromBranch
   local isPushToOrigin
   local result
+  local info
 
   # 目标分支
   targetBranch=$1
@@ -290,7 +292,7 @@ function mergeFrom() {
   isPushToOrigin=$3
 
   # 签出源分支，并 pull
-  checkoutBranch $fromBranch
+  info=$(checkoutBranch $fromBranch)
   result=$?
   if [[ $result -ne 0 ]]; then
     echo $result >&2
@@ -299,7 +301,7 @@ function mergeFrom() {
   fi
 
   # 签出目标分支，并 pull
-  checkoutBranch $targetBranch
+  info=$(checkoutBranch $targetBranch)
   result=$?
   if [[ $result -ne 0 ]]; then
     echo $result >&2
@@ -308,12 +310,12 @@ function mergeFrom() {
   fi
 
   # 将分支 ${fromBranch} 合并至 ${targetBranch} 分支
-  git merge --no-edit $fromBranch
+  info=$(git merge --no-edit $fromBranch)
 
   result=$?
   if [[ $result -ne 0 ]]; then
     # echo -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
-    git reset --hard HEAD --
+    info=$(git reset --hard HEAD --)
     if [[ $? -ne 0 ]]; then
       echo 2 >&2
       echo false
@@ -326,7 +328,7 @@ function mergeFrom() {
   fi
 
   if [[ $isPushToOrigin == true ]]; then
-    git push
+    info=$(git push)
     if [[ $? -ne 0 ]]; then
       echo 1 >&2
       echo false
@@ -374,6 +376,7 @@ function mergeFromMaster() {
 function removeLocalBranch() {
     local targetBranch
     local existsBranch
+    local info
 
     targetBranch=$1
 
@@ -387,7 +390,7 @@ function removeLocalBranch() {
     fi
 
     # "删除本地分支 $targetBranch"
-    git branch -d $targetBranch
+    info=$(git branch -d $targetBranch)
 
     return $?
 }
@@ -400,6 +403,7 @@ function removeLocalBranch() {
 function removeRemoteBranch() {
     local targetBranch
     local existsBranch
+    local info
 
     targetBranch=$1
     existsBranch=$(existsBranch origin/$targetBranch)
@@ -412,7 +416,7 @@ function removeRemoteBranch() {
     fi
 
     # "删除远程分支 $targetBranch"
-    git push origin --delete $targetBranch
+    info=$(git push origin --delete $targetBranch)
 
     return $?
 }
@@ -429,13 +433,14 @@ function removeBranch() {
     local targetBranch
     local deleteRemoteResult
     local deleteLocalResult
+    local info
 
     targetBranch=$1
 
-    removeRemoteBranch targetBranch
+    info=$(removeRemoteBranch targetBranch)
     deleteRemoteResult=$?
 
-    removeLocalBranch targetBranch
+    info=$(removeLocalBranch targetBranch)
     deleteLocalResult=$?
 
     if [[ $deleteLocalResult == 1 && $deleteRemoteResult == 1 ]]; then
@@ -532,7 +537,9 @@ function select_branches_for_merge() {
 }
 
 function standardVersion() {
-  npm run standard-version
+  local info
+
+  info=$(npm run standard-version)
 
   if [[ $? -ne 0 ]]; then
     echo false
