@@ -8,6 +8,7 @@ const {
     pushCurrentBranch,
     mergeFrom,
     standardVersion,
+    createLocalTag,
     release
 } = require('./git-helper');
 
@@ -27,12 +28,12 @@ async function start() {
     ]);
 
     if (!isPublish) {
-        throw new Error('发布失败：您取消了发布当前分支。');
+        throw new Error('您取消了发布当前分支。');
     }
 
     const isClean = await isCurrentBranchClean();
     if (!isClean) {
-        throw new Error('发布失败：请确保当前分支是干净的并且与远程代码同步，才可发布当前分支。');
+        throw new Error('请确保当前分支是干净的并且与远程代码同步，才可发布当前分支。');
     }
 
     let defaultTag = currentBranch.match(/(\d+\.){3}\d+/) || void 0;
@@ -86,31 +87,35 @@ async function start() {
 
     logTips("拉取远程仓库状态...");
     if (!(await pullCurrentBranch())) {
-        throw new Error(`发布失败：当前分支 ${currentBranch} 更新失败，请手动处理完冲突，再重新发布。`);
+        throw new Error(`当前分支 ${currentBranch} 更新失败，请手动处理完冲突，再重新发布。`);
     }
 
     logTips("正在生成更新日志 CHANGELOG.md、升级版本号...");
     if (!(await standardVersion())) {
-        throw new Error("发布失败：生成更新日志，升级版本号失败；解决完此问题，可重新发布。");
+        throw new Error("生成更新日志，升级版本号失败；解决完此问题，可重新发布。");
     }
 
     if (currentBranch !== "master") {
         logTips(`将当前分支 ${currentBranch} 代码推至远程代码仓库...`);
         if (!(await pushCurrentBranch())) {
-            throw new Error(`发布失败：当前分支 ${currentBranch} 代码没有成功推入远程仓库，接下来你最好手动进行发版操作。`);
+            throw new Error(`当前分支 ${currentBranch} 代码没有成功推入远程仓库，接下来你最好手动进行发版操作。`);
         }
 
         if ((await mergeFrom("master", currentBranch)) !== 0) {
-            throw new Error(`发布失败：分支 ${currentBranch} 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。`)
+            throw new Error(`分支 ${currentBranch} 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。`)
         }
     }
-    await release(currentBranch, tagName, tagDescription, mergeBackBranches);
-    
-    // console.log(info);
+
+    logTips(`正在创建本地 tag ${tagName}...`);
+    if (!(await createLocalTag(tagName, tagDescription))) {
+        throw new Error(`创建本地 tag ${tagName} 失败；接下来你最好手动进行发版操作。`);
+    }
+
+    await release(currentBranch, mergeBackBranches);
 }
 
 start().catch(err => {
-    console.log("\x1b[31m%s\x1b[0m", err.message);
+    console.log("\x1b[31m发布失败：%s\x1b[0m", err.message);
 });
 
 
