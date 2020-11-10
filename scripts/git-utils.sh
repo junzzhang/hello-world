@@ -33,11 +33,11 @@ function pullCurrentBranch() {
   if [[ $? -ne 0 ]]; then
     git reset --hard HEAD --
     if [[ $? -ne 0 ]]; then
-      echo false
+      echo false >&2
       return 2
     fi
 
-    echo false
+    echo false >&2
     return 1
   fi
 

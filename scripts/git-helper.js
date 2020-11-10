@@ -7,7 +7,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec('bash ./scripts/git-helper.sh --current-branch', (error, stdout, stderr) => {
                 if (error) {
-                    reject(error);
+                    return reject((stderr || error.message));
                 }
                 resolve(stdout.replace(/^\s+|\s+$/, ''));
             })
@@ -17,7 +17,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec('bash ./scripts/git-helper.sh --enable-merge-back-branches "' + strExcludeBranches + '"', (error, stdout, stderr) => {
                 if (error) {
-                    reject(error);
+                    return reject((stderr || error.message));
                 }
                 resolve(stdout.split(/\s+/).filter(item => !!item));
             })
@@ -27,7 +27,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec('bash ./scripts/git-helper.sh --is-current-branch-clean', (error, stdout, stderr) => {
                 if (error) {
-                    reject(error);
+                    return reject(false);
                 }
                 resolve(stdout.replace(/^\s+|\s+$/, '') === "true");
             })
@@ -37,7 +37,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec('bash ./scripts/git-helper.sh --pull-current-branch', (error, stdout, stderr) => {
                 if (error) {
-                    reject(error);
+                    return reject(false);
                 }
                 resolve(stdout.replace(/^\s+|\s+$/, '') === "true");
             })
@@ -47,7 +47,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec('bash ./scripts/git-helper.sh --push-current-branch', (error, stdout, stderr) => {
                 if (error) {
-                    reject(error);
+                    return reject((stderr || error.message));
                 }
                 resolve(stdout.replace(/^\s+|\s+$/, '') === "true");
             })
@@ -67,7 +67,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec('bash ./scripts/git-helper.sh --standard-version', (error, stdout, stderr) => {
                 if (error) {
-                    reject(error);
+                    return reject((stderr || error.message));
                 }
                 resolve(stdout.replace(/^\s+|\s+$/, '') === "true");
             })
@@ -80,7 +80,7 @@ module.exports = {
 
             const ll = exec(`bash ./scripts/release.sh ${currentBranch} ${tagName} "${strTagDescription}" "${strMergeBackBranches}"`, (error, stdout, stderr) => {
                 if (error) {
-                    reject(error);
+                    return reject((stderr || error.message));
                 }
                 resolve(stdout);
             });

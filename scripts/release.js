@@ -86,7 +86,7 @@ async function start() {
 
     logTips("拉取远程仓库状态...");
     if (!(await pullCurrentBranch())) {
-        throw new Error("发布失败：当前分支 $current_branch 更新失败，请手动处理完冲突，再重新发布。");
+        throw new Error(`发布失败：当前分支 ${currentBranch} 更新失败，请手动处理完冲突，再重新发布。`);
     }
 
     logTips("正在生成更新日志 CHANGELOG.md、升级版本号...");
