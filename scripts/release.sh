@@ -26,44 +26,12 @@ function release_main() {
   new_tag_message=$3
   preMergeBranches=($4)
 
-    echo "更新远程仓库状态..."
-    git pull
-    if [[ $? -ne 0 ]]; then
-      echo -e "\n\033[31m 发布失败：当前分支 $current_branch 更新失败，请手动处理完冲突，再重新发布。 \033[0m\n"
-      return 1
-    fi
 
-    echo "正在升级版本号，生成更新日志 CHANGELOG.md ..."
-    npm run standard-version
-
-    if [[ $? -ne 0 ]]; then
-      echo -e "\n\033[31m 发布失败：升级版本号，生成更新日志失败，解决完此问题，可重新发布。 \033[0m\n"
-      return 1
-    fi
-
-    if [[ $current_branch != "master" ]]
-    then
-      echo "将当前分支 $current_branch 代码推至远程代码仓库..."
-      git push
-
-      if [[ $? -ne 0 ]]; then
-        echo -e "\n\033[31m 发布失败：当前分支 $current_branch 代码没有成功推入远程仓库，接下来你最好手动进行发版操作。 \033[0m\n"
-        return 1
-      fi
-
-      # 将当前分支 合并至 master 分支
-      mergeFrom "master" $current_branch
-
-      if [[ $? -ne 0 ]]; then
-        echo -e "\n\033[31m 发布失败：分支 $current_branch 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。 \033[0m\n"
-        return 1
-      fi
-    fi
 
   echo "正在创建本地 tag $new_tag"
   # git tag -a $new_tag -m $new_tag
   # 下面一行省略了 -m $new_tag，则强制弹出 tag 备注信息输入文本框
-  git tag -a $new_tag -m "${new_tag_message//\\\n/'" -m "'}"
+  git tag -a $new_tag -m "${new_tag_message}"
 
   echo "将代码推至远程代码仓库"
   git push --follow-tags origin master
