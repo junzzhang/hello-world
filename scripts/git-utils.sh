@@ -17,7 +17,7 @@ function isCurrentBranchClean() {
   if [[ $? -ne 0 ]]; then
     return 1
   fi
-
+  echo statusInfo = ${statusInfo}
   arrStatusInfo=(${statusInfo//\#/''})
 
   if [[ ${#arrStatusInfo[@]} -eq 1 ]]; then
