@@ -110,8 +110,7 @@ function release_main() {
 # 转到工作目录，git 根目录
 cd $(dirname $0)/..
 
-echo $(pwd)
 # 执行发版操作
-release_main $1 $2 $3 "$4"
+release_main $1 $2 "$3" "$4"
 
 exit 0
