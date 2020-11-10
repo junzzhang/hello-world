@@ -58,8 +58,10 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec(`bash ./scripts/git-helper.sh --merge-from ${to} ${from} ${isPushToOrigin || false}`, (error, stdout, stderr) => {
                 if (error) {
+                    console.log("stderr = ", stderr);
                     return resolve(stderr.replace(/^\s+|\s+$/, '') >> 0);
                 }
+                console.log("stdout = ", stdout);
                 resolve(stdout.replace(/^\s+|\s+$/, '') >> 0);
             })
         })
