@@ -36,7 +36,9 @@ module.exports = {
     async release(currentBranch, tagName, tagDescription, mergeBackBranches) {
         return new Promise((resolve, reject) => {
             const strMergeBackBranches = mergeBackBranches.join(" ");
-            exec(`bash ./scripts/release.sh ${currentBranch} ${tagName} ${tagDescription} "${strMergeBackBranches}"`, (error, stdout, stderr) => {
+            const strTagDescription = tagDescription.replace(/\"/, "\\\"");
+
+            exec(`bash ./scripts/release.sh ${currentBranch} ${tagName} "${strTagDescription}" "${strMergeBackBranches}"`, (error, stdout, stderr) => {
                 if (error) {
                     reject(error);
                 }
