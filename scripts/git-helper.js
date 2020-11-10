@@ -40,6 +40,7 @@ module.exports = {
                     console.log(stderr);
                     return reject(false);
                 }
+                console.log("stdout = ", stdout);
                 resolve(stdout.replace(/^\s+|\s+$/, '') === "true");
             })
         })
