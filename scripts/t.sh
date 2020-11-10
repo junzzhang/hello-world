@@ -1,6 +1,8 @@
 #!/bin/bash
 
-echo length = $#
-for name in $@; do
-  echo -e $name
-done
+function test() {
+  echo "errrrr" >& 2
+  return 1
+}
+
+test

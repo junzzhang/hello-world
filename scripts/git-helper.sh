@@ -17,5 +17,17 @@ if [[ $# -gt 0 ]]; then
       --is-current-branch-clean)
         isCurrentBranchClean
         ;;
+      --pull-current-branch)
+        pullCurrentBranch
+        ;;
+      --push-current-branch)
+        pushCurrentBranch
+        ;;
+      --merge-from)
+        mergeFrom $1 $2 $3
+        ;;
+      --standard-version)
+        standardVersion
+        ;;
   esac
 fi

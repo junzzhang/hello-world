@@ -1,6 +1,19 @@
 'use strict';
 const inquirer = require('inquirer');
-const { isCurrentBranchClean, getCurrentBranch, getAllEnableMergeBackBranches, release } = require('./git-helper');
+const {
+    isCurrentBranchClean,
+    getCurrentBranch,
+    getAllEnableMergeBackBranches,
+    pullCurrentBranch,
+    pushCurrentBranch,
+    mergeFrom,
+    standardVersion,
+    release
+} = require('./git-helper');
+
+function logTips(str) {
+    console.log("\x1b[33m%s\x1b[0m", str);
+}
 
 async function start() {
     const currentBranch = await getCurrentBranch();
@@ -71,6 +84,26 @@ async function start() {
 
     const { tagName, tagDescription, mergeBackBranches } = await inquirer.prompt(questions);
 
+    logTips("拉取远程仓库状态...");
+    if (!(await pullCurrentBranch())) {
+        throw new Error("发布失败：当前分支 $current_branch 更新失败，请手动处理完冲突，再重新发布。");
+    }
+
+    logTips("正在生成更新日志 CHANGELOG.md、升级版本号...");
+    if (!(await standardVersion())) {
+        throw new Error("发布失败：生成更新日志，升级版本号失败；解决完此问题，可重新发布。");
+    }
+
+    if (currentBranch !== "master") {
+        logTips(`将当前分支 ${currentBranch} 代码推至远程代码仓库...`);
+        if (!(await pushCurrentBranch())) {
+            throw new Error(`发布失败：当前分支 ${currentBranch} 代码没有成功推入远程仓库，接下来你最好手动进行发版操作。`);
+        }
+
+        if ((await mergeFrom("master", currentBranch)) !== 0) {
+            throw new Error(`发布失败：分支 ${currentBranch} 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。`)
+        }
+    }
     const info = await release(currentBranch, tagName, tagDescription, mergeBackBranches);
     
     console.log(info);
