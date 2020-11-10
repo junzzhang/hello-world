@@ -29,7 +29,6 @@ module.exports = {
                 if (error) {
                     reject(error);
                 }
-                console.log('stdout = ', stdout);
                 resolve(stdout.replace(/^\s+|\s+$/, '') === "true");
             })
         })

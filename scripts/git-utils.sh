@@ -17,14 +17,15 @@ function isCurrentBranchClean() {
   if [[ $? -ne 0 ]]; then
     return 1
   fi
-  echo statusInfo = ${statusInfo}
+
   arrStatusInfo=(${statusInfo//\#/''})
 
   if [[ ${#arrStatusInfo[@]} -eq 1 ]]; then
     echo true
+  else
+    echo false
   fi
 
-  echo false
   return 0
 }
 
@@ -42,9 +43,9 @@ function isCurrentBranchBehindOrigin() {
 
   if [[ -z $(echo ${statusInfo} | grep -E "\bbehind\b\s+\d+") ]]; then
     echo false
+  else
+    echo true
   fi
-
-  echo true
 
   return 0
 }
@@ -63,9 +64,9 @@ function isCurrentBranchAheadOfOrigin() {
 
   if [[ -z $(echo ${statusInfo} | grep -E "\bahead\b\s+\d+") ]]; then
     echo false
+  else
+    echo true
   fi
-
-  echo true
 
   return 0
 }
