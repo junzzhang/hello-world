@@ -86,11 +86,7 @@ module.exports = {
             });
 
             ll.stdout.on('data', (data) => {
-                console.log(`stdout: ${data}`);
-            });
-
-            ll.stderr.on('data', (data) => {
-                console.error(`stderr: ${data}`);
+                console.log(`${data}`);
             });
         })
     }
