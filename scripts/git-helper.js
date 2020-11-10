@@ -84,7 +84,18 @@ module.exports = {
                 if (error) {
                     return reject(new Error(`Tag ${tag} 创建时错误。`));
                 }
-                resolve(true);
+                exec(cmd, (error, stdout, stderr) => {
+                    if (error) {
+                        return reject(new Error(`Tag ${tag} 创建时错误。`));
+                    }
+
+                    exec('git push --follow-tags origin master', (err, result) => {
+                        if (err) {
+                            return reject(new Error(`分支 master 代码没有成功推到远程仓库，接下来你最好手动进行发版操作。`));
+                        }
+                        resolve(true);
+                    });
+                });
             })
         })
     },
