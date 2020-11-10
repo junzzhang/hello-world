@@ -24,7 +24,7 @@ if [[ $# -gt 0 ]]; then
         pushCurrentBranch
         ;;
       --merge-from)
-        mergeFrom $1 $2 $3
+        mergeFrom $2 $3 $4
         ;;
       --standard-version)
         standardVersion

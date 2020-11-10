@@ -107,12 +107,12 @@ async function start() {
         }
     }
 
-    // logTips(`正在创建本地 tag ${tagName}...`);
-    // if (!(await createLocalTag(tagName, tagDescription))) {
-    //     throw new Error(`创建本地 tag ${tagName} 失败；接下来你最好手动进行发版操作。`);
-    // }
-    //
-    // await release(currentBranch, mergeBackBranches);
+    logTips(`正在创建本地 tag ${tagName}...`);
+    if (!(await createLocalTag(tagName, tagDescription))) {
+        throw new Error(`创建本地 tag ${tagName} 失败；接下来你最好手动进行发版操作。`);
+    }
+
+    await release(currentBranch, mergeBackBranches);
 }
 
 start().catch(err => {
