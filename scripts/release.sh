@@ -22,9 +22,6 @@ function release_main() {
   current_branch=$1
   preMergeBranches=($2)
 
-  echo "将代码推至远程代码仓库"
-  git push --follow-tags origin master
-
   if [[ $? -ne 0 ]]; then
     echo -e "\n\033[31m 发布失败：分支 master 代码没有成功推到远程仓库，接下来你最好手动进行发版操作。 \033[0m\n"
     return 1
