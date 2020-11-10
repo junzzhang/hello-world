@@ -1,8 +1,13 @@
 #!/bin/bash
 
 function test() {
-  echo "errrrr" >& 2
-  return 1
+  echo $1
 }
 
-test
+abc="abc1234\n8uj"
+
+test abc<<eof
+${abc}
+asfsfdsfdf
+sfsldjfsdlkf
+eof
