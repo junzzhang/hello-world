@@ -12,6 +12,7 @@ const {
     removeRemoteBranch,
     removeLocalBranch
 } = require('./git-utils');
+const BottomBar = require('inquirer/lib/ui/bottom-bar');
 
 function logTips(str) {
     console.log("\x1b[33m%s\x1b[0m", str);
@@ -135,10 +136,11 @@ async function start() {
     }
 
     if (mergeBackBranches.length) {
-        logTips("正在回合代码...");
-        const successBranches = await mergeBack(mergeBackBranches, 0, []);
-        const failBranches = mergeBackBranches.filter(item => successBranches.findIndex(name => name === item) === -1);
-        logTips("回合代码完毕\n");
+        const ui = new BottomBar({ bottomBar: `正在回合代码：${mergeBackBranches.length}/0` });
+        const successBranches = await mergeBack(mergeBackBranches, 0, [], (i) => {
+            ui.updateBottomBar(`正在回合代码：${mergeBackBranches.length}/${i + 1}`);
+        });
+        logTips("\n");
 
         if (successBranches.length) {
             logTips(`回合成功的分支有 ${successBranches.length} 个，如下所示：\n`);
@@ -148,6 +150,7 @@ async function start() {
             logTips("\n");
         }
 
+        const failBranches = mergeBackBranches.filter(item => successBranches.findIndex(name => name === item) === -1);
         if (failBranches.length) {
             logTips(`回合失败的分支有 ${failBranches.length} 个，如下所示：\n`);
             successBranches.forEach(item => {
@@ -166,7 +169,7 @@ async function start() {
  * @param currentIndex -
  * @returns {Promise<undefined|*>}
  */
-async function mergeBack(mergeBackBranches, currentIndex, successBranches) {
+async function mergeBack(mergeBackBranches, currentIndex, successBranches, callback) {
     if (currentIndex >= mergeBackBranches.length) {
         return successBranches;
     }
@@ -174,11 +177,14 @@ async function mergeBack(mergeBackBranches, currentIndex, successBranches) {
     const status = await mergeFrom(branch, "master", true);
     switch (status) {
         case 0: // 成功
+            callback(currentIndex);
             successBranches.push(branch);
             return await mergeBack(mergeBackBranches, ++currentIndex, successBranches);
         case 2: // 终止回合
+            callback(currentIndex);
             return successBranches;
         default: // 失败
+            callback(currentIndex);
             return mergeBack(mergeBackBranches, ++currentIndex, successBranches);
     }
 }
@@ -186,14 +192,3 @@ async function mergeBack(mergeBackBranches, currentIndex, successBranches) {
 start().catch(err => {
     console.log("\x1b[31m发布失败：%s\x1b[0m", err.message);
 });
-
-
-// var BottomBar = require('inquirer/lib/ui/bottom-bar');
-//
-// var loader = ['/ Installing', '| Installing', '\\ Installing', '- Installing'];
-// var i = 4;
-// var ui = new BottomBar({ bottomBar: loader[i % 4] });
-//
-// setInterval(() => {
-//     ui.updateBottomBar(loader[i++ % 4]);
-// }, 300);
