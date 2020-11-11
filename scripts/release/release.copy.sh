@@ -9,8 +9,8 @@
 #    4. 回合代码 ：Master 分支回合至 指定的开发、测试及 hotfix 分支
 ##############################################################
 
-source ./scripts/array-utils.sh
-source ./scripts/git-utils.sh
+source ./scripts/release/array-utils.sh
+source ./scripts/release/git-utils.sh
 
 function release_main() {
   local current_branch
@@ -134,7 +134,7 @@ function release_main() {
 }
 
 # 转到工作目录，git 根目录
-cd $(dirname $0)/..
+cd $(dirname $0)/../..
 
 # 执行发版操作
 release_main
