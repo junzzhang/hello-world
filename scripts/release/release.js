@@ -10,8 +10,7 @@ const {
     standardVersion,
     createLocalTag,
     removeRemoteBranch,
-    removeLocalBranch,
-    release
+    removeLocalBranch
 } = require('./git-utils');
 
 function logTips(str) {
@@ -87,46 +86,103 @@ async function start() {
 
     const { tagName, tagDescription, mergeBackBranches } = await inquirer.prompt(questions);
 
-    logTips("拉取远程仓库状态...");
+    logTips("正在拉取远程仓库状态...");
     if (!(await pullCurrentBranch())) {
         throw new Error(`当前分支 ${currentBranch} 更新失败，请手动处理完冲突，再重新发布。`);
     }
+    logTips("远程仓库状态拉取完毕。");
 
     logTips("正在生成更新日志 CHANGELOG.md、升级版本号...");
     if (!(await standardVersion())) {
         throw new Error("生成更新日志，升级版本号失败；解决完此问题，可重新发布。");
     }
+    logTips("更新日志 CHANGELOG.md、版本号升级 完毕。");
 
     if (currentBranch !== "master") {
-        logTips(`将当前分支 ${currentBranch} 代码推至远程代码仓库...`);
+        logTips(`正在将当前分支 ${currentBranch} 代码推至远程代码仓库...`);
         if (!(await pushCurrentBranch())) {
             throw new Error(`当前分支 ${currentBranch} 代码没有成功推入远程仓库，接下来你最好手动进行发版操作。`);
         }
+        logTips(`将当前分支 ${currentBranch} 代码已推至远程代码仓库。`);
 
-        logTips(`将当前分支 ${currentBranch} 合并至 master 分支`)
+        logTips(`将当前分支 ${currentBranch} 合并至 master 分支...`);
         if ((await mergeFrom("master", currentBranch)) !== 0) {
             throw new Error(`分支 ${currentBranch} 代码没有成功合并入 master 分支，接下来你最好手动进行发版操作。`)
         }
+        logTips(`当前分支 ${currentBranch} 合并至 master 分支完毕。`);
     }
 
-    logTips(`正在创建本地 tag ${tagName}...`);
+    logTips(`正在创建本地 Tag ${tagName}...`);
     if (!(await createLocalTag(tagName, tagDescription))) {
         throw new Error(`创建本地 tag ${tagName} 失败；接下来你最好手动进行发版操作。`);
     }
+    logTips(`本地 Tag ${tagName} 创建完毕。`);
 
     if (currentBranch !== "master") {
         logTips(`删除远程分支 ${currentBranch}...`);
         if (!(await removeRemoteBranch(currentBranch))) {
-            throw new Error(`远程分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`);
+            console.log("\x1b[31m发布失败：%s\x1b[0m", `远程分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`);
+        } else {
+            logTips(`远程分支 ${currentBranch} 删除完毕。`);
         }
 
         logTips(`删除本地分支 ${currentBranch} 合并至 master 分支`)
         if (!(await removeLocalBranch(currentBranch))) {
-            throw new Error(`本地分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`)
+            console.log("\x1b[31m发布失败：%s\x1b[0m", `本地分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`)
+        } else {
+            logTips(`本地分支 ${currentBranch} 删除完毕。`);
         }
     }
 
-    await release(mergeBackBranches);
+    if (mergeBackBranches.length) {
+        logTips("正在回合代码...");
+        const successBranches = await mergeBack(mergeBackBranches, 0, []);
+        const failBranches = mergeBackBranches.filter(item => successBranches.findIndex(item) === -1);;
+        logTips("回合代码完毕\n");
+
+        if (successBranches.length) {
+            logTips(`回合成功的分支有 ${successBranches.length} 个，如下所示：\n`);
+            successBranches.forEach(item => {
+                logTips(item);
+            });
+            logTips("\n");
+        }
+
+        if (failBranches.length) {
+            logTips(`回合失败的分支有 ${failBranches.length} 个，如下所示：\n`);
+            successBranches.forEach(item => {
+                console.log("\x1b[31m%s\x1b[0m", item);
+            });
+            logTips("\n");
+        }
+    }
+
+    logTips('发布完成。\n');
+}
+
+/**
+ * 回合代码
+ * @param asyncFuncs -
+ * @param currentIndex -
+ * @returns {Promise<undefined|*>}
+ */
+async function mergeBack(mergeBackBranches, currentIndex, successBranches) {
+    if (currentIndex >= mergeBackBranches.length) {
+        return;
+    }
+    const branch = mergeBackBranches[currentIndex];
+    const status = await mergeFrom(branch, "master", true);
+    switch (status) {
+        case 0: // 成功
+            await mergeBack(mergeBackBranches, ++currentIndex);
+            successBranches.push(branch);
+        case 2: // 终止回合
+            break;
+        default: // 失败
+            return mergeBack(mergeBackBranches, ++currentIndex);
+    }
+
+    return successBranches;
 }
 
 start().catch(err => {
