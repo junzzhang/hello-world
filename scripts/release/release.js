@@ -140,6 +140,7 @@ async function start() {
         const successBranches = await mergeBack(mergeBackBranches, 0, [], (i) => {
             ui.updateBottomBar(`正在回合代码：${mergeBackBranches.length}/${i + 1}`);
         });
+        ui.close();
         logTips("\n");
 
         if (successBranches.length) {
