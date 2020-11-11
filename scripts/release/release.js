@@ -12,7 +12,7 @@ const {
     removeRemoteBranch,
     removeLocalBranch,
     release
-} = require('./git-helper');
+} = require('./git-utils');
 
 function logTips(str) {
     console.log("\x1b[33m%s\x1b[0m", str);
