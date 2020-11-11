@@ -1,11 +1,12 @@
 'use strict';
 
 const { exec } = require('child_process');
+const SCRIPTS_PATH = './scripts/release/git-helper.sh';
 
 module.exports = {
     async getCurrentBranch() {
         return new Promise((resolve, reject) => {
-            exec('bash ./scripts/git-helper.sh --current-branch', (error, stdout, stderr) => {
+            exec(`bash ${SCRIPTS_PATH} --current-branch`, (error, stdout, stderr) => {
                 if (error) {
                     // error.code
                     return reject(new Error("获取当前分支名时出错。"));
@@ -16,7 +17,7 @@ module.exports = {
     },
     async getAllEnableMergeBackBranches(strExcludeBranches) {
         return new Promise((resolve, reject) => {
-            exec('bash ./scripts/git-helper.sh --enable-merge-back-branches "' + strExcludeBranches + '"', (error, stdout, stderr) => {
+            exec(`bash ${SCRIPTS_PATH} --enable-merge-back-branches "` + strExcludeBranches + '"', (error, stdout, stderr) => {
                 if (error) {
                     return reject((stderr || error.message));
                 }
@@ -26,7 +27,7 @@ module.exports = {
     },
     async isCurrentBranchClean() {
         return new Promise((resolve, reject) => {
-            exec('bash ./scripts/git-helper.sh --is-current-branch-clean', (error, stdout, stderr) => {
+            exec(`bash ${SCRIPTS_PATH} --is-current-branch-clean`, (error, stdout, stderr) => {
                 if (error) {
                     return reject(false);
                 }
@@ -36,7 +37,7 @@ module.exports = {
     },
     async pullCurrentBranch() {
         return new Promise((resolve, reject) => {
-            exec('bash ./scripts/git-helper.sh --pull-current-branch', (error, stdout, stderr) => {
+            exec(`bash ${SCRIPTS_PATH} --pull-current-branch`, (error, stdout, stderr) => {
                 if (error) {
                     return reject(false);
                 }
@@ -46,7 +47,7 @@ module.exports = {
     },
     async pushCurrentBranch() {
         return new Promise((resolve, reject) => {
-            exec('bash ./scripts/git-helper.sh --push-current-branch', (error, stdout, stderr) => {
+            exec(`bash ${SCRIPTS_PATH} --push-current-branch`, (error, stdout, stderr) => {
                 if (error) {
                     return reject((stderr || error.message));
                 }
@@ -56,21 +57,21 @@ module.exports = {
     },
     async removeRemoteBranch(localBranchName) {
         return new Promise((resolve, reject) => {
-            exec(`bash ./scripts/git-helper.sh --remove-remote-branch ${localBranchName}`, (error, stdout, stderr) => {
+            exec(`bash ${SCRIPTS_PATH} --remove-remote-branch ${localBranchName}`, (error, stdout, stderr) => {
                 resolve(error ? false : true);
             })
         })
     },
     async removeLocalBranch(localBranchName) {
         return new Promise((resolve, reject) => {
-            exec(`bash ./scripts/git-helper.sh --remove-local-branch ${localBranchName}`, (error, stdout, stderr) => {
+            exec(`bash ${SCRIPTS_PATH} --remove-local-branch ${localBranchName}`, (error, stdout, stderr) => {
                 resolve(error ? false : true);
             })
         })
     },
     async mergeFrom(to, from, isPushToOrigin) {
         return new Promise((resolve, reject) => {
-            exec(`bash ./scripts/git-helper.sh --merge-from ${to} ${from} ${isPushToOrigin || false}`, (error, stdout, stderr) => {
+            exec(`bash ${SCRIPTS_PATH} --merge-from ${to} ${from} ${isPushToOrigin || false}`, (error, stdout, stderr) => {
                 if (error) {
                     return resolve(stderr.replace(/^\s+|\s+$/, '') >> 0);
                 }
@@ -80,7 +81,7 @@ module.exports = {
     },
     async standardVersion() {
         return new Promise((resolve, reject) => {
-            exec('bash ./scripts/git-helper.sh --standard-version', (error, stdout, stderr) => {
+            exec(`bash ${SCRIPTS_PATH} --standard-version`, (error, stdout, stderr) => {
                 if (error) {
                     return reject((stderr || error.message));
                 }
@@ -117,7 +118,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             const strMergeBackBranches = mergeBackBranches.join(" ");
 
-            const ll = exec(`bash ./scripts/release.sh "${strMergeBackBranches}"`, (error, stdout, stderr) => {
+            const ll = exec(`bash ./scripts/release/release.sh "${strMergeBackBranches}"`, (error, stdout, stderr) => {
                 if (error) {
                     return reject((stderr || error.message));
                 }
