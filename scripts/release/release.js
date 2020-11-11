@@ -180,13 +180,13 @@ async function mergeBack(mergeBackBranches, currentIndex, successBranches, callb
         case 0: // 成功
             callback(currentIndex);
             successBranches.push(branch);
-            return await mergeBack(mergeBackBranches, ++currentIndex, successBranches);
+            return await mergeBack(mergeBackBranches, ++currentIndex, successBranches, callback);
         case 2: // 终止回合
             callback(currentIndex);
             return successBranches;
         default: // 失败
             callback(currentIndex);
-            return mergeBack(mergeBackBranches, ++currentIndex, successBranches);
+            return mergeBack(mergeBackBranches, ++currentIndex, successBranches, callback);
     }
 }
 
