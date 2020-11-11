@@ -168,21 +168,19 @@ async function start() {
  */
 async function mergeBack(mergeBackBranches, currentIndex, successBranches) {
     if (currentIndex >= mergeBackBranches.length) {
-        return;
+        return successBranches;
     }
     const branch = mergeBackBranches[currentIndex];
     const status = await mergeFrom(branch, "master", true);
     switch (status) {
         case 0: // 成功
-            await mergeBack(mergeBackBranches, ++currentIndex);
             successBranches.push(branch);
+            return await mergeBack(mergeBackBranches, ++currentIndex, successBranches);
         case 2: // 终止回合
-            break;
+            return successBranches;
         default: // 失败
-            return mergeBack(mergeBackBranches, ++currentIndex);
+            return mergeBack(mergeBackBranches, ++currentIndex, successBranches);
     }
-
-    return successBranches;
 }
 
 start().catch(err => {
