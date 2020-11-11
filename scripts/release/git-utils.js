@@ -113,21 +113,5 @@ module.exports = {
                 });
             })
         })
-    },
-    async release(mergeBackBranches) {
-        return new Promise((resolve, reject) => {
-            const strMergeBackBranches = mergeBackBranches.join(" ");
-
-            const ll = exec(`bash ./scripts/release/release.sh "${strMergeBackBranches}"`, (error, stdout, stderr) => {
-                if (error) {
-                    return reject((stderr || error.message));
-                }
-                resolve(stdout);
-            });
-
-            ll.stdout.on('data', (data) => {
-                console.log(`${data}`);
-            });
-        })
     }
 };
