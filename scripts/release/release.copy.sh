@@ -9,7 +9,7 @@
 #    4. 回合代码 ：Master 分支回合至 指定的开发、测试及 hotfix 分支
 ##############################################################
 
-source ./scripts/release/array-utils.sh
+source ./scripts/release/array-utils.copy.sh
 source ./scripts/release/git-utils.sh
 
 function release_main() {
