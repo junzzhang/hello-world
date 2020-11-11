@@ -137,8 +137,7 @@ async function start() {
     if (mergeBackBranches.length) {
         logTips("正在回合代码...");
         const successBranches = await mergeBack(mergeBackBranches, 0, []);
-        console.log('successBranches = ', successBranches);
-        const failBranches = mergeBackBranches.filter(item => successBranches.findIndex(item) === -1);
+        const failBranches = mergeBackBranches.filter(item => successBranches.findIndex(name => name === item) === -1);
         logTips("回合代码完毕\n");
 
         if (successBranches.length) {
@@ -168,26 +167,18 @@ async function start() {
  * @returns {Promise<undefined|*>}
  */
 async function mergeBack(mergeBackBranches, currentIndex, successBranches) {
-    console.log(1);
     if (currentIndex >= mergeBackBranches.length) {
-        console.log(2);
         return successBranches;
     }
-    console.log(3);
     const branch = mergeBackBranches[currentIndex];
-    console.log(4);
     const status = await mergeFrom(branch, "master", true);
-    console.log(5, status);
     switch (status) {
         case 0: // 成功
             successBranches.push(branch);
-            console.log(6);
             return await mergeBack(mergeBackBranches, ++currentIndex, successBranches);
         case 2: // 终止回合
-            console.log(7);
             return successBranches;
         default: // 失败
-            console.log(8);
             return mergeBack(mergeBackBranches, ++currentIndex, successBranches);
     }
 }
