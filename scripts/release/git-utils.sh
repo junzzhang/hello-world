@@ -47,17 +47,13 @@ function pullCurrentBranch() {
 #         0 表示成功
 #         1 表示失败
 function pushCurrentBranch() {
-  local info
-
   # 同步远程仓库...
-  info=$(git push)
+  git push
 
   if [[ $? -ne 0 ]]; then
-    echo false
     return 1
   fi
 
-  echo true
   return 0
 }
 
@@ -521,15 +517,11 @@ function select_branches_for_merge() {
 }
 
 function standardVersion() {
-  local info
-
-  info=$(npm run standard-version)
+  npm run standard-version
 
   if [[ $? -ne 0 ]]; then
-    echo false
     return 1
   fi
 
-  echo true
   return 0
 }
