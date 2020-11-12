@@ -51,7 +51,7 @@ module.exports = {
     },
     async standardVersion() {
         return runCmd(`bash ${SCRIPTS_PATH} --standard-version`)
-            .then(result => result === "true");
+            .then(() => true);
     },
     async createLocalTag(tag, tagDescription) {
         const strDesc = (tagDescription || tag).replace(/\"/g, "\\\"").replace(/\n/g, '" -m "');
