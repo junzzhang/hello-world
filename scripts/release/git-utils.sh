@@ -27,23 +27,18 @@ function getCurrentBranch() {
 #         1 表示失败
 #         2 表示撤销 merge 失败
 function pullCurrentBranch() {
-  local info
-
   # 同步远程仓库...
-  info=$(git pull)
+  git pull
 
   if [[ $? -ne 0 ]]; then
-    info=$(git reset --hard HEAD --)
+    git reset --hard HEAD --
     if [[ $? -ne 0 ]]; then
-      echo false >&2
       return 2
     fi
 
-    echo false >&2
     return 1
   fi
 
-  echo true
   return 0
 }
 
@@ -52,17 +47,13 @@ function pullCurrentBranch() {
 #         0 表示成功
 #         1 表示失败
 function pushCurrentBranch() {
-  local info
-
   # 同步远程仓库...
-  info=$(git push)
+  git push
 
   if [[ $? -ne 0 ]]; then
-    echo false
     return 1
   fi
 
-  echo true
   return 0
 }
 
@@ -131,7 +122,7 @@ function isCurrentBranchBehindOrigin() {
     return 1
   fi
 
-  if [[ -z $(echo ${statusInfo} | grep -E "\bbehind\b\s+\d+") ]]; then
+  if [[ -z $(echo ${statusInfo} | grep -E "(落后|\bbehind\b)\s+\d+") ]]; then
     echo false
   else
     echo true
@@ -152,7 +143,7 @@ function isCurrentBranchAheadOfOrigin() {
     return 1
   fi
 
-  if [[ -z $(echo ${statusInfo} | grep -E "\bahead\b\s+\d+") ]]; then
+  if [[ -z $(echo ${statusInfo} | grep -E "(领先|\bahead\b)\s+\d+") ]]; then
     echo false
   else
     echo true
@@ -282,7 +273,6 @@ function mergeFrom() {
   local fromBranch
   local isPushToOrigin
   local result
-  local info
 
   # 目标分支
   targetBranch=$1
@@ -292,46 +282,40 @@ function mergeFrom() {
   isPushToOrigin=$3
 
   # 签出源分支，并 pull
-  info=$(checkoutBranch $fromBranch)
+  checkoutBranch $fromBranch
   result=$?
   if [[ $result -ne 0 ]]; then
-    echo $result >&2
     return $result
   fi
 
   # 签出目标分支，并 pull
-  info=$(checkoutBranch $targetBranch)
+  checkoutBranch $targetBranch
   result=$?
   if [[ $result -ne 0 ]]; then
-    echo $result >&2
     return $result
   fi
 
   # 将分支 ${fromBranch} 合并至 ${targetBranch} 分支
-  info=$(git merge --no-edit $fromBranch)
+  git merge --no-ff --no-edit $fromBranch
 
   result=$?
   if [[ $result -ne 0 ]]; then
     # echo -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
-    info=$(git reset --hard HEAD --)
+    git reset --hard HEAD --
     if [[ $? -ne 0 ]]; then
-      echo 2 >&2
       return 2
     fi
 
-    echo 1 >&2
     return 1
   fi
 
   if [[ $isPushToOrigin == true ]]; then
-    info=$(git push)
+    git push
     if [[ $? -ne 0 ]]; then
-      echo 1 >&2
       return 1
     fi
   fi
 
-  echo true
   return 0
 }
 
@@ -532,15 +516,11 @@ function select_branches_for_merge() {
 }
 
 function standardVersion() {
-  local info
-
-  info=$(npm run standard-version)
+  npm run standard-version
 
   if [[ $? -ne 0 ]]; then
-    echo false
     return 1
   fi
 
-  echo true
   return 0
 }
