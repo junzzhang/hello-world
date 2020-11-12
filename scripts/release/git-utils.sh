@@ -251,10 +251,10 @@ function checkoutBranch() {
     if [[ $? -ne 0 ]]; then
       return 1
     fi
-    #if [[ $isBehind == true ]]; then
-      # pullCurrentBranch
-      # return $?
-    #fi
+    if [[ $isBehind == true ]]; then
+      pullCurrentBranch
+      return $?
+    fi
 
     return 0
 }
