@@ -191,5 +191,5 @@ async function mergeBack(mergeBackBranches, currentIndex, successBranches, callb
 }
 
 start().catch(err => {
-    console.log("\x1b[31m发布失败：%s\x1b[0m", err.message);
+    console.log("\x1b[31m发布失败：%s\x1b[0m", err.message || err);
 });
