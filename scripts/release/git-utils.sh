@@ -273,7 +273,6 @@ function mergeFrom() {
   local fromBranch
   local isPushToOrigin
   local result
-  local info
 
   # 目标分支
   targetBranch=$1
@@ -283,26 +282,26 @@ function mergeFrom() {
   isPushToOrigin=$3
 
   # 签出源分支，并 pull
-  info=$(checkoutBranch $fromBranch)
+  checkoutBranch $fromBranch
   result=$?
   if [[ $result -ne 0 ]]; then
     return $result
   fi
 
   # 签出目标分支，并 pull
-  info=$(checkoutBranch $targetBranch)
+  checkoutBranch $targetBranch
   result=$?
   if [[ $result -ne 0 ]]; then
     return $result
   fi
 
   # 将分支 ${fromBranch} 合并至 ${targetBranch} 分支
-  info=$(git merge --no-edit $fromBranch)
+  git merge --no-edit $fromBranch
 
   result=$?
   if [[ $result -ne 0 ]]; then
     # echo -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
-    info=$(git reset --hard HEAD --)
+    git reset --hard HEAD --
     if [[ $? -ne 0 ]]; then
       return 2
     fi
@@ -311,7 +310,7 @@ function mergeFrom() {
   fi
 
   if [[ $isPushToOrigin == true ]]; then
-    info=$(git push)
+    git push
     if [[ $? -ne 0 ]]; then
       return 1
     fi
