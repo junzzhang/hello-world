@@ -39,7 +39,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec(`bash ${SCRIPTS_PATH} --pull-current-branch`, (error, stdout, stderr) => {
                 if (error) {
-                    return reject(stdout);
+                    return reject(stderr || stdout);
                 }
                 resolve(true);
             })
