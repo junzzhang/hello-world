@@ -296,7 +296,7 @@ function mergeFrom() {
   fi
 
   # 将分支 ${fromBranch} 合并至 ${targetBranch} 分支
-  git merge --no-edit $fromBranch
+  git merge --no-ff --no-edit $fromBranch
 
   result=$?
   if [[ $result -ne 0 ]]; then
