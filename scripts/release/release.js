@@ -154,7 +154,7 @@ async function start() {
         const failBranches = mergeBackBranches.filter(item => successBranches.findIndex(name => name === item) === -1);
         if (failBranches.length) {
             logTips(`回合失败的分支有 ${failBranches.length} 个，如下所示：\n`);
-            successBranches.forEach(item => {
+            failBranches.forEach(item => {
                 console.log("\x1b[31m%s\x1b[0m", item);
             });
             logTips("\n");
@@ -191,5 +191,5 @@ async function mergeBack(mergeBackBranches, currentIndex, successBranches, callb
 }
 
 start().catch(err => {
-    console.log("\x1b[31m发布失败：%s\x1b[0m", err.message || err);
+    console.log("\n\x1b[31m发布失败：%s\x1b[0m", err.message || err);
 });

@@ -45,7 +45,7 @@ module.exports = {
     async mergeFrom(to, from, isPushToOrigin) {
         return runCmd(`bash ${SCRIPTS_PATH} --merge-from ${to} ${from} ${isPushToOrigin || false}`)
             .then(() => 0).catch(err => {
-                console.log('err = ', err.message);
+                console.log('\n err = ', err.message);
                 return err.code;
             });
     },
