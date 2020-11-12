@@ -122,14 +122,14 @@ async function start() {
     if (currentBranch !== "master") {
         logTips(`删除远程分支 ${currentBranch}...`);
         if (!(await removeRemoteBranch(currentBranch))) {
-            console.log("\x1b[31m发布失败：%s\x1b[0m", `远程分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`);
+            console.log("\x1b[31m%s\x1b[0m", `远程分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`);
         } else {
             logTips(`远程分支 ${currentBranch} 删除完毕。`);
         }
 
-        logTips(`删除本地分支 ${currentBranch} 合并至 master 分支`)
+        logTips(`删除本地分支 ${currentBranch}...`)
         if (!(await removeLocalBranch(currentBranch))) {
-            console.log("\x1b[31m发布失败：%s\x1b[0m", `本地分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`)
+            console.log("\x1b[31m%s\x1b[0m", `本地分支 ${currentBranch} 删除失败，稍后请稍后手动删除。`)
         } else {
             logTips(`本地分支 ${currentBranch} 删除完毕。`);
         }
@@ -154,7 +154,7 @@ async function start() {
         const failBranches = mergeBackBranches.filter(item => successBranches.findIndex(name => name === item) === -1);
         if (failBranches.length) {
             logTips(`回合失败的分支有 ${failBranches.length} 个，如下所示：\n`);
-            successBranches.forEach(item => {
+            failBranches.forEach(item => {
                 console.log("\x1b[31m%s\x1b[0m", item);
             });
             logTips("\n");
@@ -191,5 +191,5 @@ async function mergeBack(mergeBackBranches, currentIndex, successBranches, callb
 }
 
 start().catch(err => {
-    console.log("\x1b[31m发布失败：%s\x1b[0m", err.message);
+    console.log("\n\x1b[31m发布失败：%s\x1b[0m", err.message || err);
 });
