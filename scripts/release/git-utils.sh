@@ -143,7 +143,7 @@ function isCurrentBranchAheadOfOrigin() {
     return 1
   fi
 
-  if [[ -z $(echo ${statusInfo} | grep -E "\bahead\b\s+\d+") ]]; then
+  if [[ -z $(echo ${statusInfo} | grep -E "(领先|\bahead\b)\s+\d+") ]]; then
     echo false
   else
     echo true
