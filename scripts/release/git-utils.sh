@@ -35,11 +35,9 @@ function pullCurrentBranch() {
   if [[ $? -ne 0 ]]; then
     info=$(git reset --hard HEAD --)
     if [[ $? -ne 0 ]]; then
-      echo false >&2
       return 2
     fi
 
-    echo false >&2
     return 1
   fi
 
@@ -295,7 +293,6 @@ function mergeFrom() {
   info=$(checkoutBranch $fromBranch)
   result=$?
   if [[ $result -ne 0 ]]; then
-    echo $result >&2
     return $result
   fi
 
@@ -303,7 +300,6 @@ function mergeFrom() {
   info=$(checkoutBranch $targetBranch)
   result=$?
   if [[ $result -ne 0 ]]; then
-    echo $result >&2
     return $result
   fi
 
@@ -315,23 +311,19 @@ function mergeFrom() {
     # echo -e "\033[31m 将分支 ${fromBranch} 合并至分支 ${targetBranch} 失败，取消合并操作... \033[0m"
     info=$(git reset --hard HEAD --)
     if [[ $? -ne 0 ]]; then
-      echo 2 >&2
       return 2
     fi
 
-    echo 1 >&2
     return 1
   fi
 
   if [[ $isPushToOrigin == true ]]; then
     info=$(git push)
     if [[ $? -ne 0 ]]; then
-      echo 1 >&2
       return 1
     fi
   fi
 
-  echo true
   return 0
 }
 

@@ -41,7 +41,7 @@ module.exports = {
                 if (error) {
                     return reject(false);
                 }
-                resolve(stdout.replace(/^\s+|\s+$/, '') === "true");
+                resolve(true);
             })
         })
     },
@@ -73,9 +73,11 @@ module.exports = {
         return new Promise((resolve, reject) => {
             exec(`bash ${SCRIPTS_PATH} --merge-from ${to} ${from} ${isPushToOrigin || false}`, (error, stdout, stderr) => {
                 if (error) {
-                    return resolve(stderr.replace(/^\s+|\s+$/, '') >> 0);
+                    console.log('stdout = ', stdout);
+                    console.log('stderr = ', stderr);
+                    return resolve(error.code);
                 }
-                resolve(stdout.replace(/^\s+|\s+$/, '') >> 0);
+                resolve(0);
             })
         })
     },
