@@ -27,13 +27,11 @@ function getCurrentBranch() {
 #         1 表示失败
 #         2 表示撤销 merge 失败
 function pullCurrentBranch() {
-  local info
-
   # 同步远程仓库...
-  info=$(git pull)
+  git pull
 
   if [[ $? -ne 0 ]]; then
-    info=$(git reset --hard HEAD --)
+    git reset --hard HEAD --
     if [[ $? -ne 0 ]]; then
       return 2
     fi
@@ -41,7 +39,6 @@ function pullCurrentBranch() {
     return 1
   fi
 
-  echo true
   return 0
 }
 
